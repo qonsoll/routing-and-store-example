@@ -1,25 +1,18 @@
-import logo from './logo.svg';
-import './App.css';
+import '@qonsoll/react-design/dist/styles/styles.css'
+import '@qonsoll/react-design/dist/styles/vars/index.css'
+import './styles.css'
+import Navigator from './pages/Navigator'
+import { SessionProvider } from './contexts/Session'
+import { StoreProvider } from './contexts/Store'
 
-function App() {
+export default function App() {
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <SessionProvider>
+        <StoreProvider>
+          <Navigator />
+        </StoreProvider>
+      </SessionProvider>
     </div>
-  );
+  )
 }
-
-export default App;
