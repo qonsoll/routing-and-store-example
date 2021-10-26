@@ -49,7 +49,7 @@ const updateRecord = (state, payload) => {
     }
 
     return stateCopy
-  } catch (e) {
+  } catch (err) {
     // Handling errors
     console.error(err)
   }
