@@ -4,7 +4,8 @@ import { Form, Input, Button } from 'antd'
 import { useStore } from 'contexts/Store'
 
 const UserSimpleForm = ({ id }) => {
-  const { useGetId, addRecord, saveRecord, findRecord } = useStore()
+  const { useGetId, addRecord, saveRecord, findRecord, updateRecord } =
+    useStore()
   const newId = useGetId('users')
   const recordId = id || newId
   return (
@@ -64,9 +65,13 @@ const UserSimpleForm = ({ id }) => {
           <Col cw="auto">
             <Button
               type="primary"
-              onClick={() =>
-                saveRecord({ collectionPath: 'users', id: recordId })
-              }
+              onClick={() => {
+                if (!id) {
+                  saveRecord({ collectionPath: 'users', id: recordId })
+                } else {
+                  updateRecord({ collectionPath: 'users', id: recordId })
+                }
+              }}
             >
               Submit
             </Button>

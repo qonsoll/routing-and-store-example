@@ -32,7 +32,7 @@ const StoreProvider = ({ children }) => {
   const removeRecord = useRemoveRecord(dispatch)
   const rollbackAttributes = useRollbackAttributes(dispatch)
   const saveRecord = useSaveRecord(store, dispatch)
-  const updateRecord = useUpdateRecord(dispatch)
+  const updateRecord = useUpdateRecord(store, dispatch)
 
   console.log('store ->', store)
 
