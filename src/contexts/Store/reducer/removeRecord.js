@@ -22,7 +22,6 @@ const removeRecord = (state, payload) => {
     const recordIndex = stateCopy[type][collectionPath].findIndex(
       (record) => record.id === id
     )
-    console.log(recordIndex)
     if (!stateCopy[DIRTY][collectionPath]) {
       stateCopy[DIRTY][collectionPath] = {}
     }
@@ -30,11 +29,9 @@ const removeRecord = (state, payload) => {
       stateCopy[type][collectionPath][recordIndex]
     stateCopy[type][collectionPath].splice(recordIndex, 1)
   } else {
-    console.log(type, collectionPath, id)
     delete stateCopy[type][collectionPath][id]
   }
-  console.log(`StateCopy in remove`, stateCopy)
-  return { ...stateCopy }
+  return stateCopy
 }
 
 export default removeRecord
