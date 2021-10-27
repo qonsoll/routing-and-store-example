@@ -7,9 +7,7 @@ const { deleteDocument } = firestoreService
 
 const useDestroyRecord = (dispatch) => {
   const destroyRecord = async ({ collectionPath, id }) => {
-    console.log(collectionPath, id)
     const record = await deleteDocument(collectionPath, id)
-    console.log(record)
 
     const recordId = id
     const payload = {

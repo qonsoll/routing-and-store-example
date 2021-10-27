@@ -4,7 +4,13 @@ import { useStore } from '../../../contexts/Store'
 
 const useUserActions = () => {
   const history = useHistory()
-  const { createRecord, removeRecord, destroyRecord, destroyDirty } = useStore()
+  const {
+    createRecord,
+    removeRecord,
+    destroyRecord,
+    destroyDirty,
+    fetchRecord
+  } = useStore()
 
   const create = (payload) => createRecord('user', payload)
   const redirectToCreate = () => history.push(PATHS.AUTHENTICATED.USER_CREATE)
@@ -12,6 +18,7 @@ const useUserActions = () => {
   const remove = (id) => removeRecord({ collectionPath: 'users', id })
   const destroy = (id) => destroyRecord({ collectionPath: 'users', id })
   const destroyDirtyUsers = () => destroyDirty({ collectionPath: 'users' })
+  const update = (id) => fetchRecord({ collectionPath: 'users', id })
 
   return {
     create,
@@ -19,7 +26,8 @@ const useUserActions = () => {
     redirectToCreate,
     remove,
     destroy,
-    destroyDirtyUsers
+    destroyDirtyUsers,
+    update
   }
 }
 

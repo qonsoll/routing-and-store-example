@@ -9,13 +9,11 @@ const destroyDirty = (state, payload) => {
   const { collectionPath } = payload
 
   if (stateCopy[DIRTY][collectionPath]) {
-    console.log('Has dirty users')
-
     Object.keys(stateCopy[DIRTY][collectionPath]).map(async (user) => {
       await deleteDocument(collectionPath, user)
       delete stateCopy[DIRTY][collectionPath][user]
     })
-  } else console.log('No dirty users')
+  }
   return { ...stateCopy }
 }
 

@@ -4,7 +4,8 @@ import { Form, Input, Button } from 'antd'
 import { useStore } from 'contexts/Store'
 
 const UserSimpleForm = ({ id }) => {
-  const { useGetId, addRecord, saveRecord, findRecord } = useStore()
+  const { useGetId, addRecord, saveRecord, findRecord, getDirtyAttributes } =
+    useStore()
   const newId = useGetId('users')
   const recordId = id || newId
   return (
@@ -59,7 +60,13 @@ const UserSimpleForm = ({ id }) => {
         </Row>
         <Row h="right">
           <Col cw="auto">
-            <Button>Cancel</Button>
+            <Button
+              onClick={() =>
+                getDirtyAttributes({ collectionPath: 'users', id })
+              }
+            >
+              Cancel
+            </Button>
           </Col>
           <Col cw="auto">
             <Button
