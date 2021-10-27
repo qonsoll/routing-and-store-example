@@ -4,8 +4,6 @@ const { ORDERED } = RECORD_TYPES
 
 const removeRecord = (state, payload) => {
   const { type, collectionPath, id } = payload
-  console.log('remove record')
-  console.log(state)
   try {
     // Validation
     // ?this validation is not working because you trying to find property by value,
