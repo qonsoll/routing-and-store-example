@@ -7,9 +7,14 @@ const updateRecord = (state, payload) => {
     const { type, collectionPath, id, values } = payload
 
     // Validation
-    if (!RECORD_TYPES[type]) {
-      throw new Error('No type provided to the updateRecord (reducer)')
-    }
+    // ?this validation is not working because you trying to find property by value,
+    // ?but you should find by name of prop
+    //
+    // if (!RECORD_TYPES[type]) {
+    //   throw new Error('No type provided to the updateRecord (reducer)')
+    // }
+    // there not beautifull but working validation
+    // Object.values(RECORD_TYPES).indexOf(type) > -1
 
     if (!collectionPath) {
       throw new Error(
@@ -26,15 +31,18 @@ const updateRecord = (state, payload) => {
     }
 
     // Creating copy of the state
-    const stateCopy = state
+    const stateCopy = JSON.parse(JSON.stringify(state))
 
     // Assigning default values if not exists
-    stateCopy[type][collectionPath] =
-      stateCopy[type][collectionPath] || type === ORDERED ? [] : {}
+    stateCopy[type][collectionPath] = stateCopy[type][collectionPath]
+      ? stateCopy[type][collectionPath]
+      : type === ORDERED
+      ? []
+      : {}
 
     // Deleting record depending on its type
     if (type === ORDERED) {
-      const recordIndex = stateCopy[collectionPath].findIndex(
+      const recordIndex = stateCopy[type][collectionPath].findIndex(
         (record) => record._id === id
       )
       stateCopy[type][collectionPath][recordIndex] = {
@@ -47,7 +55,6 @@ const updateRecord = (state, payload) => {
         ...values
       }
     }
-
     return stateCopy
   } catch (err) {
     // Handling errors

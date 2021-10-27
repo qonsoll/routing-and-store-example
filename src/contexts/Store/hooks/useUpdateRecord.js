@@ -1,9 +1,9 @@
 import { RECORD_TYPES } from '../__constants__'
 import { firestoreService } from 'services/firebase'
 
-const { updateDocument } = firestoreService
-
 const { STRUCTURED, ORDERED, DIRTY } = RECORD_TYPES
+
+const { updateDocument } = firestoreService
 
 const useUpdateRecord = (store, dispatch) => {
   const updateRecord = ({ collectionPath, id }) => {
@@ -11,7 +11,6 @@ const useUpdateRecord = (store, dispatch) => {
     const documentData = clone[DIRTY][collectionPath][id]
 
     updateDocument(collectionPath, id, documentData)
-
     dispatch({
       type: 'updateRecord',
       payload: { type: STRUCTURED, collectionPath, id, values: documentData }

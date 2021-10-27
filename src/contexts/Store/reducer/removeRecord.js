@@ -4,10 +4,23 @@ const { ORDERED } = RECORD_TYPES
 
 const removeRecord = (state, payload) => {
   const { type, collectionPath, id } = payload
+  console.log('remove record')
+  console.log(state)
   try {
     // Validation
-    if (!RECORD_TYPES[type]) {
-      throw new Error('No type provided to the removeRecord (reducer)')
+    // ?this validation is not working because you trying to find property by value,
+    // ?but you should find by name of prop
+    //
+    // if (!RECORD_TYPES[type]) {
+    //   throw new Error('No type provided to the updateRecord (reducer)')
+    // }
+    // there not beautifull but working validation
+    // Object.values(RECORD_TYPES).indexOf(type) > -1
+
+    if (!collectionPath) {
+      throw new Error(
+        'No collectionPath provided to the updateRecord (reducer)'
+      )
     }
   } catch (err) {
     // Handling errors
@@ -24,6 +37,7 @@ const removeRecord = (state, payload) => {
     )
     stateCopy[collectionPath].splice(recordIndex, 1)
   } else {
+    console.log()
     delete stateCopy[type][collectionPath][id]
   }
 
