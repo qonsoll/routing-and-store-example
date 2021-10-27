@@ -10,12 +10,14 @@ const useUserActions = () => {
   const redirectToCreate = () => history.push(PATHS.AUTHENTICATED.USER_CREATE)
   const redirectToEdit = (id) => history.push(`users/${id}/edit`)
   const remove = (id) => destroyRecord('user', id)
+  const redirectToAll = () => history.push(PATHS.AUTHENTICATED.USERS_ALL)
 
   return {
     create,
     redirectToEdit,
     redirectToCreate,
-    remove
+    remove,
+    redirectToAll
   }
 }
 

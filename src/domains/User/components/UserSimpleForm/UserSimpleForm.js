@@ -1,20 +1,29 @@
 import { Container, Row, Col } from '@qonsoll/react-design'
 import { Form, Input, Button } from 'antd'
 import { useStore } from 'contexts/Store'
+import useUserActions from './../../hooks/useUserActions'
 
 const UserSimpleForm = ({ id }) => {
-  const { useGetId, addRecord, saveRecord, findRecord, updateRecord } =
-    useStore()
+  const {
+    useGetId,
+    addRecord,
+    saveRecord,
+    findRecord,
+    updateRecord,
+    rollbackAttributes
+  } = useStore()
+  const { redirectToAll } = useUserActions()
   const newId = useGetId('users')
   const recordId = id || newId
+  const submitButton = id ? updateRecord : saveRecord
+  const userData = { collectionPath: 'users', id: recordId }
   return (
     <Form
       layout="vertical"
-      initialValues={findRecord({ collectionPath: 'users', id: recordId })}
+      initialValues={findRecord(userData)}
       onValuesChange={(changedValues, allValues) =>
         addRecord({
-          collectionPath: 'users',
-          id: recordId,
+          ...userData,
           values: allValues
         })
       }
@@ -59,17 +68,30 @@ const UserSimpleForm = ({ id }) => {
         </Row>
         <Row h="right">
           <Col cw="auto">
-            <Button>Cancel</Button>
+            <Button
+              onClick={() => {
+                redirectToAll()
+              }}
+            >
+              Cancel
+            </Button>
+          </Col>
+          <Col cw="auto">
+            <Button
+              onClick={() => {
+                //cancel
+                rollbackAttributes(userData)
+              }}
+            >
+              Rollback
+            </Button>
           </Col>
           <Col cw="auto">
             <Button
               type="primary"
               onClick={() => {
-                if (!id) {
-                  saveRecord({ collectionPath: 'users', id: recordId })
-                } else {
-                  updateRecord({ collectionPath: 'users', id: recordId })
-                }
+                submitButton(userData)
+                redirectToAll()
               }}
             >
               Submit

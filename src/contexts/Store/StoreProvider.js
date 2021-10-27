@@ -30,7 +30,7 @@ const StoreProvider = ({ children }) => {
   const findRecord = useFindRecord(store)
   const getDirtyAttributes = useGetDirtyAttributes(dispatch)
   const removeRecord = useRemoveRecord(dispatch)
-  const rollbackAttributes = useRollbackAttributes(dispatch)
+  const rollbackAttributes = useRollbackAttributes(store, dispatch)
   const saveRecord = useSaveRecord(store, dispatch)
   const updateRecord = useUpdateRecord(store, dispatch)
 

@@ -16,6 +16,8 @@ const updateRecord = (state, payload) => {
     // there not beautifull but working validation
     // Object.values(RECORD_TYPES).indexOf(type) > -1
 
+    // TODO: check for existing element in DIRTY
+
     if (!collectionPath) {
       throw new Error(
         'No collectionPath provided to the updateRecord (reducer)'
@@ -55,7 +57,7 @@ const updateRecord = (state, payload) => {
         ...values
       }
     }
-    return stateCopy
+    return { ...stateCopy }
   } catch (err) {
     // Handling errors
     console.error(err)
