@@ -1,21 +1,30 @@
-import { useState } from 'react'
 import { Container, Row, Col } from '@qonsoll/react-design'
 import { Form, Input, Button } from 'antd'
 import { useStore } from 'contexts/Store'
+import useUserActions from './../../hooks/useUserActions'
 
 const UserSimpleForm = ({ id }) => {
-  const { useGetId, addRecord, saveRecord, findRecord, getDirtyAttributes } =
-    useStore()
+  const {
+    useGetId,
+    addRecord,
+    saveRecord,
+    findRecord,
+    updateRecord,
+    rollbackAttributes,
+    getDirtyAttributes
+  } = useStore()
+  const { redirectToAll } = useUserActions()
   const newId = useGetId('users')
   const recordId = id || newId
+  const submitButton = id ? updateRecord : saveRecord
+  const userData = { collectionPath: 'users', id: recordId }
   return (
     <Form
       layout="vertical"
-      initialValues={findRecord({ collectionPath: 'users', id: recordId })}
+      initialValues={findRecord(userData)}
       onValuesChange={(changedValues, allValues) =>
         addRecord({
-          collectionPath: 'users',
-          id: recordId,
+          ...userData,
           values: allValues
         })
       }
@@ -61,19 +70,30 @@ const UserSimpleForm = ({ id }) => {
         <Row h="right">
           <Col cw="auto">
             <Button
-              onClick={() =>
-                getDirtyAttributes({ collectionPath: 'users', id })
-              }
+              onClick={() => {
+                redirectToAll()
+              }}
             >
               Cancel
             </Button>
           </Col>
           <Col cw="auto">
             <Button
+              onClick={() => {
+                //cancel
+                rollbackAttributes(userData)
+              }}
+            >
+              Rollback
+            </Button>
+          </Col>
+          <Col cw="auto">
+            <Button
               type="primary"
-              onClick={() =>
-                saveRecord({ collectionPath: 'users', id: recordId })
-              }
+              onClick={() => {
+                submitButton(userData)
+                redirectToAll()
+              }}
             >
               Submit
             </Button>

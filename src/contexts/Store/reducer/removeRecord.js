@@ -29,6 +29,7 @@ const removeRecord = (state, payload) => {
       stateCopy[type][collectionPath][recordIndex]
     stateCopy[type][collectionPath].splice(recordIndex, 1)
   } else {
+    console.log()
     delete stateCopy[type][collectionPath][id]
   }
   return stateCopy

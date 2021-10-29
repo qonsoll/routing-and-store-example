@@ -38,7 +38,6 @@ const useFilterRecords = (state, dispatch) => {
     //   }
     // })
   }
-
   return filterRecords
 }
 

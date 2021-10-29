@@ -24,7 +24,7 @@ const updateRecord = (state, payload) => {
       throw new Error('No values provided to the updateRecord (reducer)')
     }
     // Creating copy of the state
-    const stateCopy = { ...state }
+    const stateCopy = JSON.parse(JSON.stringify(state))
 
     // ?
     // Assigning default values if not exists
@@ -35,6 +35,7 @@ const updateRecord = (state, payload) => {
     // Deleting record depending on its type
     if (type === ORDERED) {
       const recordIndex = stateCopy[type][collectionPath].findIndex(
+
         (record) => record.id === id
       )
       stateCopy[type][collectionPath][recordIndex] = {
@@ -48,7 +49,8 @@ const updateRecord = (state, payload) => {
       }
     }
 
-    return stateCopy
+    return { ...stateCopy }
+
   } catch (err) {
     // Handling errors
     console.error(err)
