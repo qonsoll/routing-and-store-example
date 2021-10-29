@@ -4,20 +4,33 @@ import { useStore } from '../../../contexts/Store'
 
 const useUserActions = () => {
   const history = useHistory()
-  const { createRecord, destroyRecord } = useStore()
+  const {
+    createRecord,
+    removeRecord,
+    destroyRecord,
+    destroyDirty,
+    fetchRecord
+  } = useStore()
 
   const create = (payload) => createRecord('user', payload)
   const redirectToCreate = () => history.push(PATHS.AUTHENTICATED.USER_CREATE)
   const redirectToEdit = (id) => history.push(`users/${id}/edit`)
-  const remove = (id) => destroyRecord('user', id)
   const redirectToAll = () => history.push(PATHS.AUTHENTICATED.USERS_ALL)
+  const remove = (id) => removeRecord({ collectionPath: 'users', id })
+  const destroy = (id) => destroyRecord({ collectionPath: 'users', id })
+  const destroyDirtyUsers = () => destroyDirty({ collectionPath: 'users' })
+  const update = (id) => fetchRecord({ collectionPath: 'users', id })
+
 
   return {
     create,
     redirectToEdit,
     redirectToCreate,
     remove,
-    redirectToAll
+    redirectToAll,
+    destroy,
+    destroyDirtyUsers,
+    update
   }
 }
 

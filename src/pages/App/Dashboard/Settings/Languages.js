@@ -1,5 +1,5 @@
 const Languages = () => {
-  return <div>Languages</div>;
-};
+  return <div>Languages</div>
+}
 
-export default Languages;
+export default Languages

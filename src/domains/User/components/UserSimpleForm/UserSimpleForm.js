@@ -10,7 +10,8 @@ const UserSimpleForm = ({ id }) => {
     saveRecord,
     findRecord,
     updateRecord,
-    rollbackAttributes
+    rollbackAttributes,
+    getDirtyAttributes
   } = useStore()
   const { redirectToAll } = useUserActions()
   const newId = useGetId('users')

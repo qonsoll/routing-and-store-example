@@ -1,5 +1,5 @@
 const Appearance = () => {
-  return <div>Appearance</div>;
-};
+  return <div>Appearance</div>
+}
 
-export default Appearance;
+export default Appearance
