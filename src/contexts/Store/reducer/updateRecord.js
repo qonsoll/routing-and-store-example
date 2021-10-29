@@ -5,9 +5,8 @@ const { ORDERED } = RECORD_TYPES
 const updateRecord = (state, payload) => {
   try {
     const { type, collectionPath, id, values } = payload
-
     // Validation
-    if (!RECORD_TYPES[type]) {
+    if (!RECORD_TYPES[type.toUpperCase()]) {
       throw new Error('No type provided to the updateRecord (reducer)')
     }
 
@@ -24,18 +23,20 @@ const updateRecord = (state, payload) => {
     if (!values) {
       throw new Error('No values provided to the updateRecord (reducer)')
     }
-
     // Creating copy of the state
-    const stateCopy = state
+    const stateCopy = JSON.parse(JSON.stringify(state))
 
+    // ?
     // Assigning default values if not exists
-    stateCopy[type][collectionPath] =
-      stateCopy[type][collectionPath] || type === ORDERED ? [] : {}
+    // stateCopy[type][collectionPath] =
+    //   stateCopy[type][collectionPath] || type === ORDERED ? [] : {}
+    // ?
 
     // Deleting record depending on its type
     if (type === ORDERED) {
-      const recordIndex = stateCopy[collectionPath].findIndex(
-        (record) => record._id === id
+      const recordIndex = stateCopy[type][collectionPath].findIndex(
+
+        (record) => record.id === id
       )
       stateCopy[type][collectionPath][recordIndex] = {
         ...stateCopy[type][collectionPath][recordIndex],
@@ -48,8 +49,9 @@ const updateRecord = (state, payload) => {
       }
     }
 
-    return stateCopy
-  } catch (e) {
+    return { ...stateCopy }
+
+  } catch (err) {
     // Handling errors
     console.error(err)
   }

@@ -1,5 +1,5 @@
 const Storage = () => {
-  return <div>Storage</div>;
-};
+  return <div>Storage</div>
+}
 
-export default Storage;
+export default Storage

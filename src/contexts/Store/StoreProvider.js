@@ -13,7 +13,8 @@ import {
   useRemoveRecord,
   useRollbackAttributes,
   useSaveRecord,
-  useUpdateRecord
+  useUpdateRecord,
+  useDestroyDirty
 } from './hooks'
 
 const StoreProvider = ({ children }) => {
@@ -26,13 +27,15 @@ const StoreProvider = ({ children }) => {
   const destroyRecord = useDestroyRecord(dispatch)
   const fetchRecord = useFetchRecord(dispatch)
   const fetchRecords = useFetchRecords(dispatch)
-  const filterRecords = useFilterRecords(dispatch)
+  const filterRecords = useFilterRecords(store, dispatch)
   const findRecord = useFindRecord(store)
-  const getDirtyAttributes = useGetDirtyAttributes(dispatch)
+  const getDirtyAttributes = useGetDirtyAttributes(store)
   const removeRecord = useRemoveRecord(dispatch)
-  const rollbackAttributes = useRollbackAttributes(dispatch)
+  const rollbackAttributes = useRollbackAttributes(store, dispatch)
   const saveRecord = useSaveRecord(store, dispatch)
-  const updateRecord = useUpdateRecord(dispatch)
+  const updateRecord = useUpdateRecord(store, dispatch)
+  const destroyDirty = useDestroyDirty(dispatch)
+
 
   console.log('store ->', store)
 
@@ -51,7 +54,8 @@ const StoreProvider = ({ children }) => {
         rollbackAttributes,
         saveRecord,
         updateRecord,
-        useGetId
+        useGetId,
+        destroyDirty
       }}
     >
       {children}
