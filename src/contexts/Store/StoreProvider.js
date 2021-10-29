@@ -27,7 +27,7 @@ const StoreProvider = ({ children }) => {
   const destroyRecord = useDestroyRecord(dispatch)
   const fetchRecord = useFetchRecord(dispatch)
   const fetchRecords = useFetchRecords(dispatch)
-  const filterRecords = useFilterRecords(dispatch)
+  const filterRecords = useFilterRecords(store, dispatch)
   const findRecord = useFindRecord(store)
   const getDirtyAttributes = useGetDirtyAttributes(store)
   const removeRecord = useRemoveRecord(dispatch)

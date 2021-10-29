@@ -5,6 +5,7 @@ import updateCollection from './updateCollection'
 import updateRecord from './updateRecord'
 import destroyRecord from './destroyRecord'
 import destroyDirty from './destroyDirty'
+import filterRecords from './filterRecords'
 
 const reducer = (state, action) => {
   const { type, payload } = action
@@ -16,7 +17,8 @@ const reducer = (state, action) => {
     removeRecord,
     updateCollection,
     updateRecord,
-    destroyDirty
+    destroyDirty,
+    filterRecords
   }
   return actionsMap[type](state, payload)
 }
