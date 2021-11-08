@@ -1,42 +1,68 @@
-import { RECORD_TYPES } from '../__constants__'
 import { firestoreService } from 'services/firebase'
+import { RECORD_TYPES } from '../__constants__'
 
-const { ORDERED, STRUCTURED } = RECORD_TYPES
+const { DIRTY, ORDERED, STRUCTURED } = RECORD_TYPES
 const { queryDocuments } = firestoreService
+
+const above = (object, field, value) => {
+  return object[field] > value ? true : false
+}
+
+const aboveEqual = (object, field, value) => {
+  return object[field] >= value ? true : false
+}
+
+const less = (object, field, value) => {
+  return object[field] < value ? true : false
+}
+
+const lessEqual = (object, field, value) => {
+  return object[field] <= value ? true : false
+}
+
+const equal = (object, field, value) => {
+  return object[field] === value ? true : false
+}
+
+const notEqual = (object, field, value) => {
+  return object[field] !== value ? true : false
+}
+
+const filterCollection = (state, collectionPath, params) => {
+  console.log(state)
+  const filteredItems = []
+
+  const logicOperands = {
+    '>': above,
+    '<': less,
+    '>=': aboveEqual,
+    '<=': lessEqual,
+    '==': equal,
+    '!=': notEqual
+  }
+
+  params.map((item) => {
+    state[ORDERED][collectionPath].map((object) => {
+      if (logicOperands[item[1]](object, item[0], item[2]))
+        filteredItems.push(object)
+    })
+  })
+
+  return filteredItems
+}
 
 const useFilterRecords = (state, dispatch) => {
   const filterRecords = async (collectionPath, params) => {
-    const filteredRecords = []
-    const conditions = { ...params }
-
-    const query = await queryDocuments(collectionPath, [['age', '==', '23']])
-    console.log(query)
-
-    // Object.keys(conditions).map((item) => {
-    //   if (item.includes('.')) {
-    //     const fields = item.split('.')
-    //     Object.keys(conditions[item]).map((cond) => {
-    //       state[ORDERED][collectionPath].map((object) => {
-    //         console.log(fields)
-    //         console.log(
-    //           object[fields[0]][fields[1]] + cond + conditions[item][cond]
-    //         )
-    //         if (
-    //           eval(object[fields[0]][fields[1]] + cond + conditions[item][cond])
-    //         )
-    //           filteredRecords.push(object)
-    //       })
-    //     })
-    //   } else {
-    //     Object.keys(conditions[item]).map((cond) => {
-    //       state[ORDERED][collectionPath].map((object) => {
-    //         console.log(object[item] + cond + conditions[item][cond])
-    //         if (eval(object[item] + cond + conditions[item][cond]))
-    //           filteredRecords.push(object)
-    //       })
-    //     })
-    //   }
-    // })
+    const filteredRecords = await queryDocuments(collectionPath, [...params])
+    const payload = {
+      filteredRecords,
+      collectionPath
+    }
+    dispatch({ type: 'filterRecords', payload })
+    const filteredElements = filterCollection(state, collectionPath, [
+      ...params
+    ])
+    console.log(filteredElements)
   }
   return filterRecords
 }

@@ -27,16 +27,7 @@ const Sidebar = ({ store, collectionPath }) => {
       </label>
       <button
         onClick={() => {
-          filterRecords(collectionPath, {
-            age: {
-              '>=': 20,
-              '<': 90
-            },
-            'firstName.length': {
-              '>': 0,
-              '<': 10
-            }
-          })
+          filterRecords(collectionPath, [['age', '!=', '23']])
         }}
       >
         Show state
