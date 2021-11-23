@@ -1,11 +1,11 @@
 import UserSimpleForm from '../UserSimpleForm'
 import { AddressSimpleForm } from 'domains/Address/components'
 import { InterestsList } from 'domains/Interest/components'
-import { useCreateQStore, QStoreProvider, useQStore } from 'contexts/QStore'
+import { useCreateRuntimeStorage } from 'services/qonsoll-data/RuntimeStorage'
 import { divide } from 'lodash'
 
 const UserAdvancedForm = ({ id }) => {
-  const { store, document } = useCreateQStore({
+  const { store, document } = useCreateRuntimeStorage({
     ordered: {},
     structured: {}
   })
