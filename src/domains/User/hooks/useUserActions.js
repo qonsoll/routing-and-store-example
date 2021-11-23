@@ -1,36 +1,42 @@
 import { useHistory } from 'react-router-dom'
+import * as models from 'models'
 import PATHS from 'pages/paths'
 import { useStore } from '../../../contexts/Store'
 
-const useUserActions = () => {
+const { user } = models
+
+const useUserActions = (id) => {
   const history = useHistory()
   const {
-    createRecord,
     removeRecord,
     destroyRecord,
     destroyDirty,
-    fetchRecord
+    updateRecord,
+    saveRecord
   } = useStore()
 
-  const create = (payload) => createRecord('user', payload)
-  const redirectToCreate = () => history.push(PATHS.AUTHENTICATED.USER_CREATE)
-  const redirectToEdit = (id) => history.push(`users/${id}/edit`)
-  const redirectToAll = () => history.push(PATHS.AUTHENTICATED.USERS_ALL)
-  const remove = (id) => removeRecord({ collectionPath: 'users', id })
-  const destroy = (id) => destroyRecord({ collectionPath: 'users', id })
-  const destroyDirtyUsers = () => destroyDirty({ collectionPath: 'users' })
-  const update = (id) => fetchRecord({ collectionPath: 'users', id })
+  const collectionPath = user.collectionPath
+  const userId = id || user.newId
+  const userData = { collectionPath, id: userId }
 
+  const remove = () => removeRecord(userData)
+  const destroy = () => destroyRecord(userData)
+  const destroyDirtyUsers = () => destroyDirty({ collectionPath })
+  const save = () => (id ? updateRecord(userData) : saveRecord(userData))
+
+  // Redirects
+  const redirectToCreate = () => history.push(PATHS.AUTHENTICATED.USER_CREATE)
+  const redirectToEdit = () => history.push(`users/${id}/edit`)
+  const redirectToAll = () => history.push(PATHS.AUTHENTICATED.USERS_ALL)
 
   return {
-    create,
     redirectToEdit,
     redirectToCreate,
     remove,
     redirectToAll,
     destroy,
     destroyDirtyUsers,
-    update
+    save
   }
 }
 

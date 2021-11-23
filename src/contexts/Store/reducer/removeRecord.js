@@ -1,38 +1,24 @@
 import { RECORD_TYPES } from '../__constants__'
 
-const { ORDERED, DIRTY } = RECORD_TYPES
+const { ORDERED } = RECORD_TYPES
 
 const removeRecord = (state, payload) => {
-  const { type, collectionPath, id } = payload
-  try {
-    // Validation
-    if (!RECORD_TYPES[type.toUpperCase()]) {
-      throw new Error('No type provided to the removeRecord (reducer)')
-    }
-  } catch (err) {
-    // Handling errors
-    console.error(err)
-  }
+  const { collectionPath, id, type } = payload
 
   // Creating copy of the state
-  const stateCopy = state
+  const stateCopy = JSON.parse(JSON.stringify(state))
 
-  // Deleting record depending on its type
   if (type === ORDERED) {
-    const recordIndex = stateCopy[type][collectionPath].findIndex(
-      (record) => record.id === id
+    stateCopy[type][collectionPath] = stateCopy[type][collectionPath].filter(
+      (item) => item.id !== id
     )
-    if (!stateCopy[DIRTY][collectionPath]) {
-      stateCopy[DIRTY][collectionPath] = {}
-    }
-    stateCopy[DIRTY][collectionPath][id] =
-      stateCopy[type][collectionPath][recordIndex]
-    stateCopy[type][collectionPath].splice(recordIndex, 1)
   } else {
-    console.log()
-    delete stateCopy[type][collectionPath][id]
+    if (stateCopy[type][collectionPath][id]) {
+      delete stateCopy[type][collectionPath][id]
+    }
   }
-  return stateCopy
+
+  return { ...stateCopy }
 }
 
 export default removeRecord

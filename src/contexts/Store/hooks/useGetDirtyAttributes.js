@@ -1,20 +1,25 @@
 import { RECORD_TYPES } from '../__constants__'
 
-const { DIRTY, STRUCTURED } = RECORD_TYPES
+const { DIRTY } = RECORD_TYPES
 
-const useGetDirtyAttributes = (store) => {
-  const getDirtyAttributes = ({ collectionPath, id }) => {
-    const initialObject = store[STRUCTURED][collectionPath][id]
-    const dirtyObject = store[DIRTY][collectionPath]?.[id]
+const useGetDirtyAttributes = (store, findRecord, models) => {
+  const getDirtyAttributes = ({ store, modelName, collectionPath, id }) => {
+    // Get specific model data
+    const model = models[modelName]
+
+    // Get initial values for specific model
+    const initialObject =
+      findRecord({ collectionPath, id }) || model?.defaultValues
+
+    const dirtyObject = store?.[DIRTY]?.[collectionPath]?.[id]
     const dirtyAttributes = []
 
-    if (dirtyObject) {
-      Object.keys(initialObject).map((item) => {
-        if (initialObject[item] !== dirtyObject[item])
-          dirtyAttributes.push(item)
+    if (dirtyObject && initialObject) {
+      Object.keys(initialObject).forEach((item) => {
+        initialObject[item] !== dirtyObject[item] && dirtyAttributes.push(item)
       })
     }
-    console.log(dirtyAttributes)
+    return dirtyAttributes.length ? dirtyAttributes : null
   }
 
   return getDirtyAttributes

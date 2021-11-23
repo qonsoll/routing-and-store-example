@@ -1,8 +1,16 @@
+import { PageWrapper } from '@qonsoll/react-design'
+
 const Dashboard = () => {
   return (
-    <div>
-      <h1>Dashboard</h1>
-    </div>
+    <PageWrapper
+      headingProps={{
+        textAlign: 'left',
+        title: 'Dashboard',
+        titleSize: 3
+      }}
+    >
+      Dashboard will be here
+    </PageWrapper>
   )
 }
 
