@@ -26,7 +26,6 @@ const useCreateRuntimeStorage = (initialState) => {
     }
   }
 
-<<<<<<< Updated upstream
   const storage = () => {
     return {
       create: (path) =>
@@ -38,13 +37,6 @@ const useCreateRuntimeStorage = (initialState) => {
     }
   }
 
-=======
-  /**
-   * Represents a boo
-   * @param {string} title - The title of the book.
-   * @param {string} author - The author of the book.
-   */
->>>>>>> Stashed changes
   const collection = (category, collectionName) => {
     const path = `${category}.${collectionName}`
     return {
