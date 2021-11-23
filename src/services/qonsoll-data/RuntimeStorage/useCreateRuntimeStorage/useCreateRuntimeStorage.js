@@ -12,6 +12,17 @@ const useCreateRuntimeStorage = (initialState) => {
     }
   }
 
+  const storage = () => {
+    return {
+      create: (path) =>
+        dispatch({ type: 'update', payload: { path, value: {} } }),
+      update: (path, value) =>
+        dispatch({ type: 'update', payload: { path, value } }),
+      remove: (path) => dispatch({ type: 'remove', payload: { path } }),
+      get: (path) => dispatch({ type: 'get', payload: { path } })
+    }
+  }
+
   const collection = (category, collectionName) => {
     const path = `${category}.${collectionName}`
     return {
@@ -52,6 +63,7 @@ const useCreateRuntimeStorage = (initialState) => {
 
   return {
     store,
+    storage,
     category,
     collection,
     document
