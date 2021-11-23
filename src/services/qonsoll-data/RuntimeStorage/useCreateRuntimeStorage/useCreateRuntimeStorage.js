@@ -3,29 +3,32 @@ import runtimeStorageReducer from './runtimeStorageReducer'
 
 /**
  * This hook creates state for the runtime storage
- * @param {object} initialState - The title of the book
+ * @param {object} initialState - The object of the initial state
  */
 const useCreateRuntimeStorage = (initialState) => {
   const [store, dispatch] = useReducer(runtimeStorageReducer, initialState)
 
   /**
-   * Represents a book
-   * @param {string} name - The title of the book.
+   * This function returns methods for working with categories
+   * @param {string} name - The name of the category
    */
   const category = (name) => {
     const path = `${name}`
     return {
       /**
-       * Represents a book.
+       * Create a category
        */
       create: () => dispatch({ type: 'update', payload: { path, value: {} } }),
       /**
-       * Represents a book
+       * Delete a category
        */
       remove: () => dispatch({ type: 'remove', payload: { path } })
     }
   }
 
+  /**
+   * This function returns methods for working with storages
+   */
   const storage = () => {
     return {
       create: (path) =>
@@ -37,45 +40,50 @@ const useCreateRuntimeStorage = (initialState) => {
     }
   }
 
+  /**
+   * This function returns methods for working with collections
+   * @param {string} category - The name of the category
+   * @param {string} collectionName - The name of the collection
+   */
   const collection = (category, collectionName) => {
     const path = `${category}.${collectionName}`
     return {
       /**
-       * Represents a book.
+       * Create a collection
        */
       create: () => dispatch({ type: 'update', payload: { path, value: {} } }),
       /**
-       * Represents a book.
-       * @param {object} value - The title of the book
+       * Update a collection
+       * @param {string} value - The name of the collection
        */
       update: (value) => dispatch({ type: 'update', payload: { path, value } }),
       /**
-       * Represents a book
+       * Remove a collection
        */
       remove: () => dispatch({ type: 'remove', payload: { path } }),
       /**
-       * Represents a book
+       * Return a collection
        */
       get: () => dispatch({ type: 'get', payload: { path } })
     }
   }
 
   /**
-   * Represents a boo
-   * @param {string} title - The title of the book.
-   * @param {string} author - The author of the book.
+   * This function returns methods for working with documents
+   * @param {string} category - The category name of the documents category.
+   * @param {string} collectionName - The collection name of the documents category.
+   * @param {string} id - The id of the document.
    */
   const document = (category, collectionName, id) => {
     const path = `${category}.${collectionName}.${id}`
     return {
       /**
-       * Represents a book
+       * Create a document
        */
       create: () => dispatch({ type: 'update', payload: { path, value: {} } }),
       /**
-       * Represents a book.
-       * @param {string} title - The title of the book.
-       * @param {string} author - The author of the book.
+       * Set a document value.
+       * @param {object} value - The value which will be set.
        */
       set: (value) =>
         dispatch({
@@ -83,9 +91,9 @@ const useCreateRuntimeStorage = (initialState) => {
           payload: { path, value }
         }),
       /**
-       * Represents a book.
-       * @param {string} title - The title of the book.
-       * @param {string} author - The author of the book.
+       * Update a document.
+       * @param {string} field - The field which will be changed.
+       * @param {object} value - The new value of the field.
        */
       update: (field, value) =>
         dispatch({
@@ -93,9 +101,9 @@ const useCreateRuntimeStorage = (initialState) => {
           payload: { path: field ? `${path}.${field}` : path, value }
         }),
       /**
-       * Represents a book.
-       * @param {string} title - The title of the book.
-       * @param {string} author - The author of the book.
+       * Push a value to field.
+       * @param {string} field - The name of the field.
+       * @param {object} value - The value which will be pushed.
        */
       push: (field, value) =>
         dispatch({
@@ -103,15 +111,12 @@ const useCreateRuntimeStorage = (initialState) => {
           payload: { path: field ? `${path}.${field}` : path, value }
         }),
       /**
-       * Represents a book.
-       * @param {string} title - The title of the book.
-       * @param {string} author - The author of the book.
+       * Remove a document.
        */
       remove: () => dispatch({ type: 'remove', payload: { path } }),
       /**
-       * Represents a book.
-       * @param {string} title - The title of the book.
-       * @param {string} author - The author of the book.
+       * Remove a field value.
+       * @param {string} field - The name of the returned field.
        */
       get: (field) =>
         dispatch({
