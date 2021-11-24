@@ -8,10 +8,14 @@ import {
   Text,
   Button
 } from '@qonsoll/react-design'
-import { useUserActions } from '../../hooks'
+// import { useUserActions } from '../../hooks'
 
 const UserSimpleView = ({ id, firstName, lastName, age }) => {
-  const { remove, redirectToEdit, destroy, update } = useUserActions(id)
+  // const { remove, redirectToEdit, destroy, update } = useUserActions(id)
+  const remove = () => {}
+  const redirectToEdit = () => {}
+  const destroy = () => {}
+  const update = () => {}
   return (
     <Card mb={3}>
       <Container>

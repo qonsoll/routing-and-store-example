@@ -1,18 +1,14 @@
-import { useStore } from '../../../../contexts/Store'
-import { useOnComponentDidMount } from 'hooks'
 import UserSimpleView from '../UserSimpleView'
+import { useFindAll } from 'services/qonsoll-data/Store'
 
 const UsersList = () => {
-  const { store, fetchRecords, filterRecords } = useStore()
-
-  useOnComponentDidMount(() => {
-    fetchRecords({ collectionPath: 'users' })
-  })
+  const [users, loading, error] = useFindAll('users')
 
   return (
     <div>
-      <div>
-        {store?.ordered?.users?.map((user) => {
+      {loading ? <div>Loading...</div> : null}
+      {users &&
+        users.map((user) => {
           const { id, firstName, lastName, age } = user
           return (
             <UserSimpleView
@@ -24,7 +20,6 @@ const UsersList = () => {
             />
           )
         })}
-      </div>
     </div>
   )
 }
