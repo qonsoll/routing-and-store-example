@@ -1,0 +1,123 @@
+import _ from 'lodash'
+import validate from './validate'
+
+class LocalStorage {
+  /**
+   * LocalStorage class
+   * @constructor
+   * @param {object} key - key of the local storage item
+   */
+  constructor(key) {
+    validate.initialState(JSON.parse(localStorage.getItem(key)))
+    this.state = JSON.parse(localStorage.getItem(key)) || {}
+  }
+
+  /**
+   * Method helps to get data from the local storage
+   * @param {string} path - path to the document
+   */
+  get(path) {
+    validate.path(path, 'get')
+    return path ? _.get(this.state, path) : null
+  }
+
+  /**
+   * Method helps to set data to the local storage
+   * @param {string} path - path to the document
+   * @param {string|object|array} value - value that should be pushed to the storage
+   */
+  set(path, value) {
+    validate.path(path, 'set')
+    validate.value(value, 'set')
+    localStorage.setItem(JSON.stringify(_.set(this.state, path, value)))
+
+    this.listener(path, this.copyState())
+  }
+
+  /**
+   * Method helps to update data in local storage
+   * @param {string} path - path to the document
+   * @param {string|object|array} value - value that should be pushed to the storage
+   */
+  update(path, value) {
+    validate.path(path, 'update')
+    validate.value(value, 'update')
+    const currentValue = _.get(this.state, path)
+    const isIterrableCurrentValue =
+      Array.isArray(currentValue) || typeof currentValue === 'object'
+    const isIterrableValue = Array.isArray(value) || typeof value === 'object'
+    const isIterrableBothValues = isIterrableCurrentValue && isIterrableValue
+    const newValue = isIterrableBothValues
+      ? { ...currentValue, ...value }
+      : value
+    localStorage.setItem(
+      this.key,
+      JSON.stringify(_.set(this.state, path, newValue))
+    )
+
+    this.listener(path, this.copyState())
+  }
+
+  /**
+   * Method helps to push data to the field of local storage
+   * @param {string} path - path to the document
+   * @param {string|object|array} value - value that should be pushed to the storage
+   */
+  push(path, value) {
+    validate.path(path, 'push')
+    validate.value(value, 'push')
+    const currentValue = _.get(this.state, path) || []
+    const isCurrentValueArray = Array.isArray(currentValue)
+    isCurrentValueArray && currentValue.push(value)
+    localStorage.setItem(
+      this.key,
+      JSON.stringify(_.set(this.state, path, currentValue))
+    )
+
+    this.listener(path, this.copyState())
+  }
+
+  /**
+   * Method helps to remove data from the local storage
+   * @param {string} path - path to the document
+   */
+  remove(path) {
+    validate.path(path, 'remove')
+    _.unset(this.state, path)
+    localStorage.setItem(this.key, JSON.stringify(this.state))
+    this.listener(path, this.copyState())
+  }
+
+  /**
+   * Listener method
+   * @param {string} path - path to the document
+   * @param {object} newState - new state object
+   */
+  listener(path, newState) {}
+
+  /**
+   * Method helps to subscribe to the changes in local storage
+   * @param {function} callback - initial state of the storage
+   */
+  subscribe(callback) {
+    if (callback) {
+      this.listener = callback
+    }
+  }
+
+  /**
+   * Remove subscription to the local storage
+   */
+  unsubscribe() {
+    this.listener = (path, newState) => {}
+  }
+
+  /**
+   * Make copy of the state
+   */
+  copyState() {
+    return JSON.parse(JSON.stringify(this.state))
+  }
+}
+
+export default LocalStorage
