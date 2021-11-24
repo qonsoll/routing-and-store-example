@@ -5,9 +5,8 @@ import useLocalStorage from '../useLocalStorage'
  * Subscribe to the Local Storage updates
  * @param {string} path - path to the document
  */
-const useListenLocalStorage = (path) => {
+const useListenLocalStorage = (storage, path) => {
   // Get storage current state
-  const { storage } = useLocalStorage()
   // Local state
   const [localStorage, setLocalStorage] = useState(storage?.state)
 
