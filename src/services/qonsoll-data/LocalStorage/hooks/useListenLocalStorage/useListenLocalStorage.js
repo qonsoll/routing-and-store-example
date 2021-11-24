@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react'
-import useLocalStorage from '../useLocalStorage'
 
 /**
  * Subscribe to the Local Storage updates
