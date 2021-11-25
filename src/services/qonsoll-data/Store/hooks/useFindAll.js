@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react'
 import useStore from '../useStore'
 import { graphQlQueryToJson } from 'graphql-query-to-json'
 import pluralize from 'pluralize'
+import { object } from 'yup/lib/locale'
 
 const useFindAll = (query, config) => {
   const { runtimeStorage, defaultAdapter, models } = useStore()
@@ -58,21 +59,6 @@ const useFindAll = (query, config) => {
 
       // Get model from the database
       let documents = await defaultAdapter.findAll(modelName)
-
-      // Get document data by query
-      const getDocumentData = (query, document) => {
-        let result = {}
-        Object.keys(query).forEach((field) => {
-          typeof field === 'object'
-            ? (result[field] = getDocumentData(query, document))
-            : (result[field] = document[field])
-        })
-        return result
-      }
-
-      documents.forEach((document) => {
-        console.log(getDocumentData(queryJSON.query[modelName], document))
-      })
 
       // // Get requested fields
       // const requestedFields = getRequestedFields(queryJSON, modelName)
