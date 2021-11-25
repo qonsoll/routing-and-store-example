@@ -59,7 +59,7 @@ const useFindAll = (query, config) => {
       // Get model from the database
       let documents = await defaultAdapter.findAll(modelName)
 
-      // Recurse method
+      // Get document data by query
       const getDocumentData = (query, document) => {
         let result = {}
         Object.keys(query).forEach((field) => {
