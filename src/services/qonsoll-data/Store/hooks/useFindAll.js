@@ -59,6 +59,21 @@ const useFindAll = (query, config) => {
       // Get model from the database
       let documents = await defaultAdapter.findAll(modelName)
 
+      // Recurse method
+      const getDocumentData = (query, document) => {
+        let result = {}
+        Object.keys(query).forEach((field) => {
+          typeof field === 'object'
+            ? (result[field] = getDocumentData(query, document))
+            : (result[field] = document[field])
+        })
+        return result
+      }
+
+      documents.forEach((document) => {
+        console.log(getDocumentData(queryJSON.query[modelName], document))
+      })
+
       // // Get requested fields
       // const requestedFields = getRequestedFields(queryJSON, modelName)
 
