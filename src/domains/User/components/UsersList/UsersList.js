@@ -1,8 +1,20 @@
 import UserSimpleView from '../UserSimpleView'
 import { useFindAll } from 'services/qonsoll-data/Store'
 
+const query = `query {
+    users {
+      firstName,
+      lastName,
+      address {
+        city,
+        country
+      },
+      interests
+    }
+} `
+
 const UsersList = () => {
-  const [users, loading, error] = useFindAll('users')
+  const [users, loading, error] = useFindAll(query)
 
   return (
     <div>

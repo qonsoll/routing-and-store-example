@@ -85,15 +85,26 @@ const createFirestoreAdapter = (app) => {
   /**
    * Get record by id (relationship)
    */
-  const findBelongsTo = async () => {
-    // Not clear yet
+  const findBelongsTo = async (path, id) => {
+    if (path && id) {
+      const docSnapshot = await findRecord(path, id)
+      return docSnapshot
+    } else {
+      return null
+    }
   }
 
   /**
    * Get all records by id (from array or sub-collection)
    */
-  const findHasMany = async () => {
-    // Not clear yet
+  const findHasMany = async (path, ids) => {
+    let result
+    if (path && ids) {
+      const promises = ids.map((id) => findRecord(path, id))
+      result = await Promise.all(promises)
+    }
+
+    return result || null
   }
 
   /**
