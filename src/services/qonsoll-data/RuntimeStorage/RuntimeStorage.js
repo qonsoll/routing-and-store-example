@@ -77,9 +77,15 @@ class RuntimeStorage {
    * Method helps to remove data from the runtime storage
    * @param {string} path - path to the document
    */
-  remove(path) {
+  remove(path, id) {
     validate.path(path, 'remove')
-    _.unset(this.state, path)
+    const currentValue = _.get(this.state, path) || {}
+    if (Array.isArray(currentValue)) {
+      const newValue =
+        currentValue.filter((item) => item.id !== id) || currentValue
+      console.log('newValue on Array ->>>>', newValue)
+      _.set(this.state, path, newValue)
+    } else _.unset(this.state, path)
 
     this.listener(path, this.copyState())
   }

@@ -1,6 +1,10 @@
 import { PageWrapper, Button } from '@qonsoll/react-design'
+import PATHS from '../../../paths'
+import { Link } from 'react-router-dom'
 import UsersList from '../../../../domains/User/components/UsersList'
 // import { useUserActions } from '../../../../domains/User/hooks'
+
+const { USER_CREATE } = PATHS.AUTHENTICATED
 
 const Users = () => {
   // const { redirectToCreate, destroyDirtyUsers } = useUserActions()
@@ -20,9 +24,11 @@ const Users = () => {
           <Button onClick={destroyDirtyUsers} mr={'8px'}>
             Clean dirty
           </Button>
-          <Button type="primary" onClick={redirectToCreate}>
-            Create
-          </Button>
+          <Link to={USER_CREATE}>
+            <Button type="primary" onClick={redirectToCreate}>
+              Create
+            </Button>
+          </Link>
         </>
       }
     >

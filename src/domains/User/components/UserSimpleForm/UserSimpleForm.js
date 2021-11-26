@@ -1,8 +1,12 @@
 import { Container, Row, Col, Input, Title } from '@qonsoll/react-design'
-import { DatePicker } from 'antd'
+import { Button, DatePicker } from 'antd'
 import { useForm, Controller } from 'react-hook-form'
+import { useMutations } from 'services/qonsoll-data/Store'
+import { useEffect } from 'react'
 
 const UserSimpleForm = ({ title, form, onValuesChange }) => {
+  const { add, remove, update } = useMutations()
+
   const { control, handleSubmit } = useForm({
     defaultValues: {
       firstName: '',
@@ -10,10 +14,26 @@ const UserSimpleForm = ({ title, form, onValuesChange }) => {
     }
   })
 
-  const onSubmit = (data) => console.log(data)
+  const onAdd = (data) =>
+    add('users', {
+      firstName: data.firstName,
+      lastName: data.lastName,
+      birthData: data.birthData,
+      address: 'address1',
+      interests: ['interest1', 'interest2', 'interest3']
+    })
+  const onRemove = () => remove('If0ZCZ9ZFYEiJCwC2DX7', 'users')
+  const onUpdate = (data) =>
+    update('If0ZCZ9ZFYEiJCwC2DX7', 'users', {
+      firstName: data.firstName,
+      lastName: data.lastName,
+      birthData: data.birthData,
+      address: 'address1',
+      interests: ['interest1', 'interest2', 'interest3']
+    })
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
+    <form onSubmit={handleSubmit(onAdd)}>
       <Container mb={4}>
         {title ? (
           <Row mb={3}>
@@ -51,6 +71,23 @@ const UserSimpleForm = ({ title, form, onValuesChange }) => {
                 <DatePicker {...field} placeholder="Enter birthdate" />
               )}
             />
+          </Col>
+        </Row>
+        <Row mt={3}>
+          <Col>
+            <Button onClick={handleSubmit(onAdd)} type="primary">
+              Add
+            </Button>
+          </Col>
+          <Col>
+            <Button onClick={handleSubmit(onRemove)} type="primary">
+              Remove
+            </Button>
+          </Col>
+          <Col>
+            <Button onClick={handleSubmit(onUpdate)} type="primary">
+              Update
+            </Button>
           </Col>
         </Row>
       </Container>
