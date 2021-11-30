@@ -11,7 +11,7 @@ const query = `query {
       },
       interests
     }
-} `
+}`
 
 const UsersList = () => {
   const [users, loading, error] = useFindAll(query)
