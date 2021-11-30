@@ -15,10 +15,7 @@ const query = `query {
 
 const UsersList = () => {
   const [users, loading, error] = useFindAll(query)
-  const peekAll = usePeekAll()
-
-  const documents = peekAll(query)
-  console.log(documents)
+  const result = usePeekAll(query)
 
   return (
     <div>
