@@ -1,5 +1,5 @@
 import UserSimpleView from '../UserSimpleView'
-import { useFindAll } from 'services/qonsoll-data/Store'
+import { useFindAll, usePeekAll } from 'services/qonsoll-data/Store'
 
 const query = `query {
     users {
@@ -15,6 +15,10 @@ const query = `query {
 
 const UsersList = () => {
   const [users, loading, error] = useFindAll(query)
+  const peekAll = usePeekAll()
+
+  const documents = peekAll(query)
+  console.log(documents)
 
   return (
     <div>
