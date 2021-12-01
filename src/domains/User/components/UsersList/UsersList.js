@@ -9,7 +9,9 @@ const query = `query {
         city,
         country
       },
-      interests
+      interests {
+        name
+      }
     }
 }`
 
