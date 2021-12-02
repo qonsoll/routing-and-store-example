@@ -13,14 +13,29 @@ import {
 } from './services/qonsoll-data/RuntimeStorage'
 import { StoreProvider } from './services/qonsoll-data/Store'
 import { createFirestoreAdapter } from './services/qonsoll-data/Adapters'
+import { construct } from 'services/qonsoll-data/Store/methods'
 
 const runtimeStorage = createRuntimeStorage({
   structured: {},
   ordered: {}
 })
 
+const tmpQuery = `query {
+  users {
+    firstName,
+    lastName,
+    age,
+    address {
+      city,
+      country
+    },
+    interests
+  }
+}`
+
 export default function App() {
   const adapter = createFirestoreAdapter(app)
+  construct(tmpQuery, models).then((res) => console.log(res))
   return (
     <div className="App">
       <SessionProvider>
