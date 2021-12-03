@@ -11,18 +11,20 @@ import {
   createRuntimeStorage,
   RuntimeStorageProvider
 } from './services/qonsoll-data/RuntimeStorage'
+import { createLocalStorage } from './services/qonsoll-data/LocalStorage'
 import { StoreProvider } from './services/qonsoll-data/Store'
 import { createFirestoreAdapter } from './services/qonsoll-data/Adapters'
 import { construct } from 'services/qonsoll-data/Store/methods'
 
-const runtimeStorage = createRuntimeStorage({
-  structured: {},
-  ordered: {}
-})
+const tmpDB = JSON.parse(
+  '{"users":{"7WB6kbZSPbrzuJJlmOwQ":{"firstName":"Yevhen","lastName":"Bogdanov1","id":"7WB6kbZSPbrzuJJlmOwQ","birthDate":null,"age":"30","public":true,"interests":["interest1","interest2","interest3"],"address":"address1"}},"addresses":{"address1":{"country":"country1","city":"city1","id":"address1"}},"cities":{"city1":{"id":"city1","name":"Khmelnitskiy"}},"countries":{"country1":{"id":"country1","name":"Ukraine"}},"interests":{"interest1":{"id":"interest1","name":"JS"},"interest2":{"id":"interest2","name":"MongoDB"},"interest3":{"name":"NodeJS","id":"interest3"}}}'
+)
+
+const runtimeStorage = createRuntimeStorage(tmpDB)
+const localStorage = createLocalStorage('test')
 
 const tmpQuery = `query {
   users {
-    firstName,
     lastName,
     age,
     address {
@@ -35,7 +37,7 @@ const tmpQuery = `query {
 
 export default function App() {
   const adapter = createFirestoreAdapter(app)
-  construct(tmpQuery, models).then((res) => console.log(res))
+  construct(tmpQuery, models, localStorage).then((res) => console.log(res))
   return (
     <div className="App">
       <SessionProvider>

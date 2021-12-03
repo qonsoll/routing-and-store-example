@@ -6,7 +6,7 @@ const tmpDB = JSON.parse(
   '{"users":{"7WB6kbZSPbrzuJJlmOwQ":{"firstName":"Yevhen","lastName":"Bogdanov1","id":"7WB6kbZSPbrzuJJlmOwQ","birthDate":null,"age":"30","public":true,"interests":["interest1","interest2","interest3"],"address":"address1"}},"addresses":{"address1":{"country":"country1","city":"city1","id":"address1"}},"cities":{"city1":{"id":"city1","name":"Khmelnitskiy"}},"countries":{"country1":{"id":"country1","name":"Ukraine"}},"interests":{"interest1":{"id":"interest1","name":"JS"},"interest2":{"id":"interest2","name":"MongoDB"},"interest3":{"name":"NodeJS","id":"interest3"}}}'
 )
 
-const construct = async (query, models) => {
+const construct = async (query, models, dataSource) => {
   // Making GraphQL query as JS object
   const queryJson = graphQlQueryToJson(query).query
 
@@ -37,7 +37,7 @@ const construct = async (query, models) => {
           resultObject[item] = defineObjectAttributes(
             defineFieldType(fields[item], models[item].fields),
             models[item].fields,
-            tmpDB[pluralize.plural(item)][dbData[item]] // TODO change database interaction to real one
+            dataSource.get(`${pluralize.plural(item)}.${dbData[item]}`) // TODO change database interaction to real one
           )
         // If dataType is hasMany then we have to extract fields of every db document from collection
         // that has name similar to this field's name and its' id is in array of current field value
@@ -50,7 +50,7 @@ const construct = async (query, models) => {
                 models[pluralize.singular(item)].fields
               ),
               models[pluralize.singular(item)].fields,
-              tmpDB[item][hasManyId] // TODO change database interaction to real one
+              dataSource.get(`${item}.${hasManyId}`) // TODO change database interaction to real one
             )
           )
       } else {
@@ -66,7 +66,7 @@ const construct = async (query, models) => {
     (acc, [collectionName, fields]) => ({
       ...acc,
       [collectionName]: Object.values(
-        tmpDB[collectionName] // TODO change database interaction to real one
+        dataSource.get(collectionName) // TODO change database interaction to real one
       ).map((item) =>
         defineObjectAttributes(
           fields,
