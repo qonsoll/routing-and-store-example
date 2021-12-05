@@ -1,6 +1,4 @@
 import { docArrayToObject } from '../helpers'
-import pluralize from 'pluralize'
-// import _ from 'lodash'
 
 class TempStorage {
   constructor() {
@@ -30,12 +28,7 @@ class TempStorage {
       promises.push(promise)
     }
     const documents = await Promise.all(promises)
-    console.log(
-      '🚀 ~ file: TempStorage.js ~ line 39 ~ TempStorage ~ findBelongsTo ~ documents',
-      documents
-    )
     this.data[collectionName] = docArrayToObject(documents)
-    console.log('--->>>>', this.data)
   }
 
   async findHasMany({ command, adapter }) {
@@ -48,7 +41,7 @@ class TempStorage {
       const promise = adapter.findHasMany(collectionName, ids)
       promises.push(promise)
     }
-    const documents = await Promise.all(promises)
+    let documents = await Promise.all(promises)
     console.log(
       '🚀 ~ file: TempStorage.js ~ line 52 ~ TempStorage ~ findHasMany ~ documents',
       documents
