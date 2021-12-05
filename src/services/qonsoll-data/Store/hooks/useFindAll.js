@@ -22,6 +22,7 @@ const useFindAll = (query, options) => {
       setLoading(false)
       if (dbData) {
         runtimeStorage.update(`structured`, dbData)
+        // TODO update without removing existing
       }
     }
     smartDataFetcher()
