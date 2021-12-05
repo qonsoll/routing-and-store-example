@@ -1,39 +1,48 @@
 import UserSimpleView from '../UserSimpleView'
 import { useFindAll } from 'services/qonsoll-data/Store'
 
+// const query = `query {
+//     users {
+//       firstName,
+//       lastName,
+//       age,
+//       address {
+//         city,
+//         country
+//       },
+//       interests {
+//         name
+//       }
+//     }
+// }`
+
 const query = `query {
     users {
       firstName,
       lastName,
-      address {
-        city,
-        country
-      },
-      interests {
-        name
-      }
+      age
     }
 }`
 
 const UsersList = () => {
-  const [users, loading, error] = useFindAll(query)
+  const [data, loading, error] = useFindAll(query)
+  console.log('🚀 ~ file: UsersList.js ~ line 29 ~ UsersList ~ data', data)
 
   return (
     <div>
       {loading ? <div>Loading...</div> : null}
-      {users &&
-        users.map((user) => {
-          const { id, firstName, lastName, age } = user
-          return (
-            <UserSimpleView
-              key={id}
-              id={id}
-              firstName={firstName}
-              lastName={lastName}
-              age={age}
-            />
-          )
-        })}
+      {data?.users?.map((user) => {
+        const { id, firstName, lastName, age } = user
+        return (
+          <UserSimpleView
+            key={id}
+            id={id}
+            firstName={firstName}
+            lastName={lastName}
+            age={age}
+          />
+        )
+      })}
     </div>
   )
 }

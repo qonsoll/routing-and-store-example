@@ -20,22 +20,8 @@ const runtimeStorage = createRuntimeStorage({
   ordered: {}
 })
 
-const tmpQuery = `query {
-  users {
-    firstName,
-    lastName,
-    age,
-    address {
-      city,
-      country
-    },
-    interests
-  }
-}`
-
 export default function App() {
   const adapter = createFirestoreAdapter(app)
-  construct(tmpQuery, models).then((res) => console.log(res))
   return (
     <div className="App">
       <SessionProvider>

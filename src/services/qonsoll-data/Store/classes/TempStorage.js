@@ -15,15 +15,11 @@ class TempStorage {
 
   async findBelongsTo({ command, adapter }) {
     const { field, collectionName, context } = command
-    console.log(
-      '🚀 ~ file: TempStorage.js ~ line 19 ~ TempStorage ~ findBelongsTo ~ command',
-      command
-    )
     const promises = []
     const contextIds = Object.keys(this.data[context])
     for (let i = 0; i < contextIds.length; i++) {
       const parentId = contextIds[i]
-      const id = this.data[context][parentId][field]
+      const id = this.data?.[context]?.[parentId]?.[field]
       const promise = adapter.findBelongsTo(collectionName, id)
       promises.push(promise)
     }
@@ -37,15 +33,11 @@ class TempStorage {
     const contextIds = Object.keys(this.data[context])
     for (let i = 0; i < contextIds.length; i++) {
       const parentId = contextIds[i]
-      const ids = this.data[context][parentId][field]
+      const ids = this.data?.[context]?.[parentId]?.[field]
       const promise = adapter.findHasMany(collectionName, ids)
       promises.push(promise)
     }
     let documents = await Promise.all(promises)
-    console.log(
-      '🚀 ~ file: TempStorage.js ~ line 52 ~ TempStorage ~ findHasMany ~ documents',
-      documents
-    )
     this.data[collectionName] = docArrayToObject(documents.flat())
   }
 }

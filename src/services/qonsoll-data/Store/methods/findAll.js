@@ -1,16 +1,12 @@
 import { graphQlQueryToJson } from 'graphql-query-to-json'
 import { buildCommandsStack, execCommands } from '../helpers'
+import construct from './construct'
 
-const findAll = async (query, adapter, models) => {
+const findAll = async (query, adapter, models, options) => {
   const queryJSON = graphQlQueryToJson(query)
   const commands = buildCommandsStack(queryJSON.query, 'findAll', models)
-  console.log('🚀 ~ file: findAll.js ~ line 80 ~ findAll ~ commands', commands)
-
-  const result = await execCommands(commands, adapter)
-  console.log(
-    '🚀 ~ file: findAll.js ~ line 10 ~ findAll ~ result',
-    JSON.stringify(result)
-  )
+  const data = await execCommands(commands, adapter)
+  const result = options?.construct ? construct(data, query, models) : data
 
   return result
 }
