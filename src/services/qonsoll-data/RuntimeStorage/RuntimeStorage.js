@@ -51,8 +51,17 @@ class RuntimeStorage {
       ? { ...currentValue, ...value }
       : value
     _.set(this.state, path, newValue)
-
+    this.deepUpdate(value)
     this.listener(path, this.copyState())
+  }
+
+  /**
+   * Method makes deep update
+   * @param {object} value - value that should merged with the storage
+   */
+  deepUpdate(value) {
+    validate.value(value, 'update')
+    _.merge(this.state, value)
   }
 
   /**
