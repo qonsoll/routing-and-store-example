@@ -1,6 +1,5 @@
 import { docArrayToObject } from '../helpers'
-import pluralize from 'pluralize'
-// import _ from 'lodash'
+import { findHasMany } from '../../RuntimeStorage/methods'
 
 class TempStorage {
   constructor() {
@@ -17,25 +16,16 @@ class TempStorage {
 
   async findBelongsTo({ command, adapter }) {
     const { field, collectionName, context } = command
-    console.log(
-      '🚀 ~ file: TempStorage.js ~ line 19 ~ TempStorage ~ findBelongsTo ~ command',
-      command
-    )
     const promises = []
     const contextIds = Object.keys(this.data[context])
     for (let i = 0; i < contextIds.length; i++) {
       const parentId = contextIds[i]
-      const id = this.data[context][parentId][field]
+      const id = this.data?.[context]?.[parentId]?.[field]
       const promise = adapter.findBelongsTo(collectionName, id)
       promises.push(promise)
     }
     const documents = await Promise.all(promises)
-    console.log(
-      '🚀 ~ file: TempStorage.js ~ line 39 ~ TempStorage ~ findBelongsTo ~ documents',
-      documents
-    )
     this.data[collectionName] = docArrayToObject(documents)
-    console.log('--->>>>', this.data)
   }
 
   async findHasMany({ command, adapter }) {
@@ -44,15 +34,47 @@ class TempStorage {
     const contextIds = Object.keys(this.data[context])
     for (let i = 0; i < contextIds.length; i++) {
       const parentId = contextIds[i]
-      const ids = this.data[context][parentId][field]
+      const ids = this.data?.[context]?.[parentId]?.[field]
       const promise = adapter.findHasMany(collectionName, ids)
       promises.push(promise)
     }
-    const documents = await Promise.all(promises)
-    console.log(
-      '🚀 ~ file: TempStorage.js ~ line 52 ~ TempStorage ~ findHasMany ~ documents',
-      documents
-    )
+    let documents = await Promise.all(promises)
+    this.data[collectionName] = docArrayToObject(documents.flat())
+  }
+
+  peekAll({ command, runtimeStorage }) {
+    const { collectionName, context } = command
+    if (!context) {
+      const documents = runtimeStorage.get(collectionName)
+      this.data[collectionName] = documents
+    }
+    // TODO handle nested collection (not id ref)
+  }
+
+  peekBelongsTo({ command, runtimeStorage }) {
+    const { field, collectionName, context } = command
+    const contextIds = Object.keys(this.data[context])
+    const documents = []
+    for (let i = 0; i < contextIds.length; i++) {
+      const parentId = contextIds[i]
+      const id = this.data?.[context]?.[parentId]?.[field]
+      const doc = runtimeStorage.get(`${collectionName}.${id}`)
+      documents.push(doc)
+    }
+    this.data[collectionName] = docArrayToObject(documents)
+  }
+
+  peekHasMany({ command, runtimeStorage }) {
+    const { field, collectionName, context } = command
+    const contextIds = Object.keys(this.data[context])
+    const documents = []
+
+    for (let i = 0; i < contextIds.length; i++) {
+      const parentId = contextIds[i]
+      const ids = this.data?.[context]?.[parentId]?.[field]
+      const promise = findHasMany(runtimeStorage, collectionName, ids)
+      documents.push(promise)
+    }
     this.data[collectionName] = docArrayToObject(documents.flat())
   }
 }

@@ -1,17 +1,13 @@
 import { graphQlQueryToJson } from 'graphql-query-to-json'
-import { buildPeekCommandsStack, execPeekCommands } from '../helpers'
+import { buildCommandsStack, execCommands } from '../helpers'
 
-const peekAll = (query, runtimeStorage, models) => {
+const peekAll = (query, runtimeStorage, adapter, models) => {
   const queryJSON = graphQlQueryToJson(query)
-  const commands = buildPeekCommandsStack(queryJSON.query, 'findAll')
-  console.log('peekAll commandStack ---->', commands)
+  const commands = buildCommandsStack(queryJSON.query, 'peekAll', models)
 
-  const result = execPeekCommands(commands, runtimeStorage, models)
-  console.log(
-    'peekResult ------> 🚀 ~ file: findAll.js ~ line 10 ~ findAll ~ result',
-    result
-  )
-  console.log('runtimeStorage ---->', runtimeStorage)
+  const result = execCommands(commands, adapter, runtimeStorage)
+
+  return result
 }
 
 export default peekAll

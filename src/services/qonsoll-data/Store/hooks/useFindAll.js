@@ -9,7 +9,6 @@ const useFindAll = (query, config) => {
   const [error, setError] = useState(null)
 
   useEffect(() => {
-    console.log('--->>', models)
     findAll(query, defaultAdapter, models).then((data) => {
       console.log('result only ->>>>>>', data)
     })

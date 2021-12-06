@@ -1,5 +1,3 @@
-import _ from 'lodash'
-
 const findHasMany = (runtimeStorage, path, ids) => {
   const result = []
 
