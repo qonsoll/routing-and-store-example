@@ -3,6 +3,7 @@ import { useFindAll, useFindRecord } from 'services/qonsoll-data/Store'
 
 const query = `query {
     users {
+      id,
       firstName,
       lastName,
       age,
