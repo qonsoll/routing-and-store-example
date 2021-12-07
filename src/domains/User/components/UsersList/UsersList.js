@@ -25,7 +25,11 @@ const query = `query {
 // }`
 
 const UsersList = () => {
-  const [data, loading] = useFindAll(query)
+  const [data, loading] = useFindAll(query, {
+    // fetchInterval: 120,
+    // forceIntervalRefresh: true,
+    // construct: true
+  })
   // const [documents] = usePeekAll(query)
   console.log('🚀 ~ file: UsersList.js ~ line 29 ~ UsersList ~ data', data)
 

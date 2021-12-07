@@ -47,7 +47,7 @@ class TempStorage {
   peekAll({ command, runtimeStorage }) {
     const { collectionName, context } = command
     if (!context) {
-      const documents = runtimeStorage.get(collectionName)
+      const documents = runtimeStorage.get(`structured.${collectionName}`)
       if (documents) {
         this.data[collectionName] = documents
       }
@@ -63,7 +63,7 @@ class TempStorage {
     for (let i = 0; i < contextIds.length; i++) {
       const parentId = contextIds[i]
       const id = this.data?.[context]?.[parentId]?.[field]
-      const doc = runtimeStorage.get(`${collectionName}.${id}`)
+      const doc = runtimeStorage.get(`structured.${collectionName}.${id}`)
       documents.push(doc)
     }
 
