@@ -5,7 +5,8 @@ const peekRecord = async ({ query, runtimeStorage, models }) => {
   const queryJSON = graphQlQueryToJson(query)
   const commands = buildCommandsStack(queryJSON.query, 'peekRecord', models)
   const result = await execCommands({ commands, runtimeStorage })
-  console.log('peekRecord result', result)
+
+  return result
 }
 
 export default peekRecord

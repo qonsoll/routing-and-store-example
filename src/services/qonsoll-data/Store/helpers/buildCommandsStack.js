@@ -11,13 +11,17 @@ const relationshipType = {
     belongsTo: 'peekBelongsTo',
     hasMany: 'peekHasMany'
   },
+  peekRecord: {
+    belongsTo: 'peekBelongsTo',
+    hasMany: 'peekHasMany'
+  },
   findAll: {
     belongsTo: 'findBelongsTo',
     hasMany: 'findHasMany'
   },
-  peekRecord: {
-    belongsTo: 'peekBelongsTo',
-    hasMany: 'peekHasMany'
+  findRecord: {
+    belongsTo: 'findBelongsTo',
+    hasMany: 'findHasMany'
   }
 }
 
@@ -35,7 +39,7 @@ const buildCommandsStack = (queryJSON, task, models) => {
           collectionName,
           field: this.key,
           context: false,
-          id: this.node?.__args?.id || null
+          args: this.node?.__args || null
         })
         relationshipTypeTaskMap = relationshipType[task]
       } else {

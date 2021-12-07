@@ -47,7 +47,7 @@ class TempStorage {
   peekAll({ command, runtimeStorage }) {
     const { collectionName, context } = command
     if (!context) {
-      const documents = runtimeStorage.get(collectionName)
+      const documents = runtimeStorage.get(`structured.${collectionName}`)
       if (documents) {
         this.data[collectionName] = documents
       }
@@ -63,7 +63,7 @@ class TempStorage {
     for (let i = 0; i < contextIds.length; i++) {
       const parentId = contextIds[i]
       const id = this.data?.[context]?.[parentId]?.[field]
-      const doc = runtimeStorage.get(`${collectionName}.${id}`)
+      const doc = runtimeStorage.get(`structured.${collectionName}.${id}`)
       documents.push(doc)
     }
 
@@ -91,16 +91,25 @@ class TempStorage {
   }
 
   peekRecord({ command, runtimeStorage }) {
-    console.log(
-      '🚀 ~ file: TempStorage.js ~ line 94 ~ TempStorage ~ peekRecord ~ runtimeStorage',
-      runtimeStorage.state
-    )
-    const { collectionName, id } = command
-    console.log('PeekRecord data ', collectionName, id)
-    console.log(runtimeStorage)
-    const doc = runtimeStorage.state.users
-    console.log('Document', doc)
-    if (document) this.data[collectionName] = doc
+    const { collectionName, args } = command
+    const { id } = args
+    const doc = runtimeStorage.get(`structured.${collectionName}.${id}`)
+    if (doc) {
+      this.data[collectionName]
+        ? (this.data[collectionName][id] = doc)
+        : (this.data[collectionName] = { [id]: doc })
+    }
+  }
+
+  async findRecord({ command, adapter }) {
+    const { collectionName, args } = command
+    const { id } = args
+    const doc = await adapter.findRecord(collectionName, id)
+    if (doc) {
+      this.data[collectionName]
+        ? (this.data[collectionName][id] = doc)
+        : (this.data[collectionName] = { [id]: doc })
+    }
   }
 }
 

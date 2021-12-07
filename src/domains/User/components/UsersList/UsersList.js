@@ -25,10 +25,18 @@ const peekQuery = `query {
 }`
 
 const UsersList = () => {
-  const [data, loading] = useFindAll(query)
-  const [document] = useFindRecord(peekQuery)
+  const [data, loading] = useFindAll(query, {
+    fetchInterval: 120,
+    forceIntervalRefresh: true,
+    construct: true
+  })
+  const [document] = useFindRecord(peekQuery, {
+    fetchInterval: 120,
+    forceIntervalRefresh: true,
+    construct: true
+  })
   // const [documents] = usePeekAll(query)
-  console.log('🚀 ~ file: UsersList.js ~ line 29 ~ UsersList ~ data', data)
+  // console.log('🚀 ~ file: UsersList.js ~ line 29 ~ UsersList ~ data', data)
   console.log('result document ---> ', document)
 
   return (
