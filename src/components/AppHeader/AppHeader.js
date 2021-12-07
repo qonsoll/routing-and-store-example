@@ -1,4 +1,4 @@
-import { Link, useHistory } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import {
   Header,
   Container,
@@ -8,7 +8,6 @@ import {
   Text,
   Img
 } from '@qonsoll/react-design'
-import { LeftOutlined } from '@ant-design/icons'
 import PATHS from '../../pages/paths'
 import BUILDER_PATHS from '../../submodules/builder/pages/paths'
 import { useSession } from '../../contexts/Session'

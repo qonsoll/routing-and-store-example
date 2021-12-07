@@ -2,7 +2,6 @@ import { Container, Row, Col, Input, Title } from '@qonsoll/react-design'
 import { Button, DatePicker } from 'antd'
 import { useForm, Controller } from 'react-hook-form'
 import { useMutations } from 'services/qonsoll-data/Store'
-import { useEffect } from 'react'
 
 const UserSimpleForm = ({ title, form, onValuesChange }) => {
   const { add, remove, update } = useMutations()

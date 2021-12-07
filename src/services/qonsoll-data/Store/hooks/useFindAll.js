@@ -1,28 +1,38 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect } from 'react'
 import useStore from '../useStore'
-import { findAll, construct } from '../methods'
+import { findAll, peekAll, construct } from '../methods'
 
 const useFindAll = (query, options) => {
   const { runtimeStorage, defaultAdapter, models } = useStore()
   const [documents, setDocuments] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
+  const [loading, setLoading] = useState(false)
+  const [error] = useState(null)
 
   useEffect(() => {
     const smartDataFetcher = async () => {
-      // Temporary get
-      // TODO peek data from runtime storage
-      // TODO peek data from LS
-      setLoading(true)
-      const dbData = await findAll(query, defaultAdapter, models, {
-        construct: false
-      })
-      const constructedData = await construct(dbData, query, models)
-      setDocuments(constructedData)
-      setLoading(false)
-      if (dbData) {
-        runtimeStorage.update(`structured`, dbData)
-        // TODO update without removing existing
+      const cachedData = await peekAll({ query, runtimeStorage, models })
+      if (Object.values(cachedData).length) {
+        console.log('take from cache 🔥')
+        const constructedData = construct(cachedData, query, models)
+        setDocuments(constructedData)
+      } else {
+        setLoading(true)
+        const dbData = await findAll({
+          query,
+          adapter: defaultAdapter,
+          models,
+          options: {
+            construct: false
+          }
+        })
+        console.log('loading data 🔥')
+        const constructedData = construct(dbData, query, models)
+        setDocuments(constructedData)
+        setLoading(false)
+        if (dbData) {
+          runtimeStorage.deepUpdate(dbData)
+          console.log(runtimeStorage)
+        }
       }
     }
     smartDataFetcher()

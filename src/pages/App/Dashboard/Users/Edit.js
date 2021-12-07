@@ -1,7 +1,7 @@
 import { ArrowLeftOutlined } from '@ant-design/icons'
 import { PageWrapper } from '@qonsoll/react-design'
 import { useParams } from 'react-router-dom'
-import { UserSimpleForm, UserAdvancedForm } from 'domains/User/components'
+import { UserAdvancedForm } from 'domains/User/components'
 import { useHistory } from 'react-router-dom'
 
 const Edit = () => {

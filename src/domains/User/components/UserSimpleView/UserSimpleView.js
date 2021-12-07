@@ -15,7 +15,6 @@ const UserSimpleView = ({ id, firstName, lastName, age }) => {
   const remove = () => {}
   const redirectToEdit = () => {}
   const destroy = () => {}
-  const update = () => {}
   return (
     <Card mb={3}>
       <Container>

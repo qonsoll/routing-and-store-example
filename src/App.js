@@ -13,12 +13,8 @@ import {
 } from './services/qonsoll-data/RuntimeStorage'
 import { StoreProvider } from './services/qonsoll-data/Store'
 import { createFirestoreAdapter } from './services/qonsoll-data/Adapters'
-import { construct } from 'services/qonsoll-data/Store/methods'
 
-const runtimeStorage = createRuntimeStorage({
-  structured: {},
-  ordered: {}
-})
+const runtimeStorage = createRuntimeStorage({})
 
 export default function App() {
   const adapter = createFirestoreAdapter(app)

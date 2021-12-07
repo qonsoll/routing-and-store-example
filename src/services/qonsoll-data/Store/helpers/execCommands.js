@@ -1,6 +1,6 @@
 import { TempStorage } from '../classes'
 
-const execCommands = async (commands, adapter, runtimeStorage) => {
+const execCommands = async ({ commands, adapter, runtimeStorage }) => {
   const storage = new TempStorage()
 
   for (let i = 0; i < commands.length; i++) {

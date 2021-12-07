@@ -1,32 +1,32 @@
 import UserSimpleView from '../UserSimpleView'
-import { useFindAll, usePeekAll } from 'services/qonsoll-data/Store'
-
-// const query = `query {
-//     users {
-//       firstName,
-//       lastName,
-//       age,
-//       address {
-//         city,
-//         country
-//       },
-//       interests {
-//         name
-//       }
-//     }
-// }`
+import { useFindAll } from 'services/qonsoll-data/Store'
 
 const query = `query {
     users {
       firstName,
       lastName,
-      age
+      age,
+      address {
+        city,
+        country
+      },
+      interests {
+        name
+      }
     }
 }`
 
+// const query = `query {
+//     users {
+//       firstName,
+//       lastName,
+//       age
+//     }
+// }`
+
 const UsersList = () => {
-  const [data, loading, error] = useFindAll(query)
-  const [documents] = usePeekAll(query)
+  const [data, loading] = useFindAll(query)
+  // const [documents] = usePeekAll(query)
   console.log('🚀 ~ file: UsersList.js ~ line 29 ~ UsersList ~ data', data)
 
   return (

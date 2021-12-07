@@ -58,21 +58,23 @@ const construct = (data, query, models) => {
 
   const queryResult =
     queryJSON &&
-    Object.entries(queryJSON).reduce(
-      (acc, [collectionName, fields]) => ({
+    Object.entries(queryJSON).reduce((acc, [collectionName, fields]) => {
+      console.log('data ->', data)
+      return {
         ...acc,
-        [collectionName]: Object.values(
-          data[collectionName] // TODO change database interaction to real one
-        ).map((item) =>
-          defineObjectAttributes(
-            fields,
-            models[pluralize.singular(collectionName)].fields,
-            item
+        [collectionName]:
+          data?.[collectionName] &&
+          Object.values(
+            data?.[collectionName] // TODO change database interaction to real one
+          ).map((item) =>
+            defineObjectAttributes(
+              fields,
+              models[pluralize.singular(collectionName)].fields,
+              item
+            )
           )
-        )
-      }),
-      {}
-    )
+      }
+    }, {})
 
   return queryResult
 }

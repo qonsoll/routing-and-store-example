@@ -1,6 +1,6 @@
 import { ArrowLeftOutlined } from '@ant-design/icons'
 import { PageWrapper } from '@qonsoll/react-design'
-import { UserSimpleForm, UserAdvancedForm } from 'domains/User/components'
+import { UserAdvancedForm } from 'domains/User/components'
 import { useHistory } from 'react-router-dom'
 
 const Create = () => {
