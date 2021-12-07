@@ -59,7 +59,6 @@ const construct = (data, query, models) => {
   const queryResult =
     queryJSON &&
     Object.entries(queryJSON).reduce((acc, [collectionName, fields]) => {
-      console.log('data ->', data)
       return {
         ...acc,
         [collectionName]:
