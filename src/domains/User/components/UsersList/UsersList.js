@@ -36,6 +36,7 @@ const UsersList = () => {
     forceIntervalRefresh: true,
     construct: true
   })
+
   // const [documents] = usePeekAll(query)
   // console.log('🚀 ~ file: UsersList.js ~ line 29 ~ UsersList ~ data', data)
   console.log('result document ---> ', document)
