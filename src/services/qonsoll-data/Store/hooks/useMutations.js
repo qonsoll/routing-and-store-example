@@ -1,67 +1,95 @@
 import useStore from '../useStore'
-import moment from 'moment'
 import pluralize from 'pluralize'
 
+/* 
+  This hook returns methods add, update and remove which work with
+  runtimeStorage and DB (using adapter)
+*/
 const useMutation = () => {
   const { runtimeStorage, defaultAdapter, models } = useStore()
 
-  const validateData = async (modelNameSingular, data) => {
-    console.log(data)
+  /**
+   * Method that helps to check if received data is correct
+   * @param {string} modelName collection name (firestore/runtimeStorage)
+   * @param {object} data data you want to validate using model validation schema
+   * @returns {boolean}
+   */
+  const validateData = async (modelName, data) => {
+    const modelNameSingular = modelName && pluralize.singular(modelName)
     const isValid = await models[modelNameSingular].validationSchema.isValid(
       data
     )
     return isValid
   }
 
-  const add = async (model, data) => {
-    const id = await defaultAdapter.generateId('users')
-    const modelNameSingular = model && pluralize.singular(model)
+  /**
+   * Method helps to normalize modelName to the format required by DB and runtimeStorage
+   * @param {string} modelName collection name (firestore/runtimeStorage)
+   * @returns {string}
+   */
+  const normalizeModelName = (modelName) => modelName && pluralize(modelName)
 
-    Object.keys(data).forEach((field) => {
-      if (moment.isMoment(data[field]))
-        data[field] = moment(data[field]).format() || null
-    })
-
-    const isValid = await validateData(modelNameSingular, data)
+  /**
+   *
+   * @param {string} modelName collection name (firestore/runtimeStorage)
+   * @param {object} data data you want to add
+   */
+  const add = async (modelName, id, data) => {
+    const normalizedModelName = normalizeModelName(modelName)
+    const documentId =
+      id || (await defaultAdapter.generateId(normalizedModelName))
+    const isValid = await validateData(modelName, data)
 
     if (isValid) {
-      data.id = id
-      runtimeStorage.set(`structured.${model}.${id}`, data)
-      runtimeStorage.push(`ordered.${model}`, data)
-      defaultAdapter.createRecord(model, id, data)
+      data.id = documentId
+
+      // Add data to the runtime storage
+      runtimeStorage.set(
+        `structured.${normalizedModelName}.${documentId}`,
+        data
+      )
+
+      // Create record in DB (depends on adapter)
+      await defaultAdapter.createRecord(normalizedModelName, documentId, data)
     } else {
       throw new Error('Invalid data')
     }
   }
 
-  const update = async (id, model, data) => {
-    const modelNameSingular = model && pluralize.singular(model)
-
-    Object.keys(data).forEach((field) => {
-      if (moment.isMoment(data[field]))
-        data[field] = moment(data[field]).format() || null
-    })
-
-    const isValid = await validateData(modelNameSingular, data)
+  /**
+   *
+   * @param {string} modelName collection name (DB/runtimeStorage)
+   * @param {string} id document id
+   * @param {object} data data you want to update
+   */
+  const update = async (modelName, id, data) => {
+    const normalizedModelName = normalizeModelName(modelName)
+    const isValid = await validateData(modelName, data)
 
     if (isValid) {
-      runtimeStorage.update(`structured.${model}.${id}`, data)
-      runtimeStorage.update(`ordered.${model}`, data)
+      // Update data in runtime storage
+      runtimeStorage.update(`structured.${normalizedModelName}.${id}`, data)
 
-      defaultAdapter.updateRecord(model, id, data)
+      // Update data in DB (depends on adapter)
+      await defaultAdapter.updateRecord(normalizedModelName, id, data)
     } else {
       throw new Error('Invalid data')
     }
-    console.log(runtimeStorage)
   }
 
-  const remove = (id, model) => {
-    runtimeStorage.remove(`structured.${model}.${id}`)
-    runtimeStorage.remove(`ordered.${model}`, id)
+  /**
+   *
+   * @param {string} modelName collection name (DB/runtimeStorage)
+   * @param {string} id document id
+   */
+  const remove = async (modelName, id) => {
+    const normalizedModelName = normalizeModelName(modelName)
 
-    defaultAdapter.destroyRecord(model, id)
+    // Remove data from runtime storage
+    runtimeStorage.remove(`structured.${normalizedModelName}.${id}`)
 
-    console.log(runtimeStorage)
+    // Remove data from DB (depends on adapter)
+    await defaultAdapter.destroyRecord(normalizedModelName, id)
   }
 
   return { add, remove, update }
