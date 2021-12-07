@@ -22,7 +22,12 @@ const useFindAll = (query, options) => {
   // in different ways (as in DB, or nested object)
   const peekCachedData = useCallback(async () => {
     // Using peekAll algorithm based on runtimeStorage peek method
-    const cachedData = await peekAll({ query, runtimeStorage, models })
+    const cachedData = await peekAll({ query, runtimeStorage, models }).catch(
+      (err) => {
+        console.error(err)
+        setError(err)
+      }
+    )
 
     // Decide how to return data (as in DB or as nested object)
     const constructedData =
@@ -43,6 +48,9 @@ const useFindAll = (query, options) => {
       options: {
         construct: false
       }
+    }).catch((err) => {
+      console.error(err)
+      setError(err)
     })
 
     // Decide how to return data (as in DB or as nested object)
@@ -57,13 +65,18 @@ const useFindAll = (query, options) => {
   // Method helps to update current state of runtimeStorage
   const updateCache = useCallback(
     async (queryHash, dbData) => {
-      // Deep updating of the current state of the storage
-      runtimeStorage.deepUpdate({ structured: dbData })
-      // Updating meta data (when request was made)
-      runtimeStorage.update(
-        `queries.${queryHash}.requestedAt`,
-        new Date().getTime()
-      )
+      try {
+        // Deep updating of the current state of the storage
+        runtimeStorage.deepUpdate({ structured: dbData })
+        // Updating meta data (when request was made)
+        runtimeStorage.update(
+          `queries.${queryHash}.requestedAt`,
+          new Date().getTime()
+        )
+      } catch (err) {
+        console.error(err)
+        setError(err)
+      }
     },
     [runtimeStorage]
   )
@@ -114,12 +127,18 @@ const useFindAll = (query, options) => {
 
       // Peek or fetch depends on conditions
       if (isQueryCached && !isRefreshAllowed) {
-        constructedData = await peekCachedData()
+        constructedData = await peekCachedData().catch((err) => {
+          console.error(err)
+          setError(err)
+        })
       } else {
         // Don't show spinner onRefetch
         !params?.disableSpinner && setLoading(true)
 
-        const data = await fetchDBData()
+        const data = await fetchDBData().catch((err) => {
+          console.error(err)
+          setError(err)
+        })
 
         // Updating cache
         updateCache(queryHash, data?.dbData)

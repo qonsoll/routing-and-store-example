@@ -3,6 +3,7 @@ import { useFindAll } from 'services/qonsoll-data/Store'
 
 const query = `query {
     users {
+      id,
       firstName,
       lastName,
       age,
@@ -15,14 +16,6 @@ const query = `query {
       }
     }
 }`
-
-// const query = `query {
-//     users {
-//       firstName,
-//       lastName,
-//       age
-//     }
-// }`
 
 const UsersList = () => {
   const [data, loading] = useFindAll(query, {
