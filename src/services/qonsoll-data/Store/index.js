@@ -3,8 +3,6 @@ export { default as StoreProvider } from './StoreProvider'
 export { default as useStore } from './useStore'
 
 // Hooks
-export { default as useFetchAll } from './hooks/useFetchAll'
-export { default as useFetchRecord } from './hooks/useFetchRecord'
 export { default as useFilter } from './hooks/useFilter'
 export { default as useFindAll } from './hooks/useFindAll'
 export { default as useFindRecord } from './hooks/useFindRecord'

@@ -1,5 +1,3 @@
-export { default as useFetchAll } from './useFetchAll'
-export { default as useFetchRecord } from './useFetchRecord'
 export { default as useFilter } from './useFilter'
 export { default as useFindAll } from './useFindAll'
 export { default as useFindRecord } from './useFindRecord'
