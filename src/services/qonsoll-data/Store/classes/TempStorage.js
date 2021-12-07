@@ -89,6 +89,19 @@ class TempStorage {
       this.data[collectionName] = docArrayToObject(documents.flat())
     }
   }
+
+  peekRecord({ command, runtimeStorage }) {
+    console.log(
+      '🚀 ~ file: TempStorage.js ~ line 94 ~ TempStorage ~ peekRecord ~ runtimeStorage',
+      runtimeStorage.state
+    )
+    const { collectionName, id } = command
+    console.log('PeekRecord data ', collectionName, id)
+    console.log(runtimeStorage)
+    const doc = runtimeStorage.state.users
+    console.log('Document', doc)
+    if (document) this.data[collectionName] = doc
+  }
 }
 
 export default TempStorage

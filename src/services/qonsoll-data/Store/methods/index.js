@@ -1,3 +1,5 @@
 export { default as findAll } from './findAll'
 export { default as peekAll } from './peekAll'
 export { default as construct } from './construct'
+export { default as peekRecord } from './peekRecord'
+export { default as findRecord } from './findRecord'
