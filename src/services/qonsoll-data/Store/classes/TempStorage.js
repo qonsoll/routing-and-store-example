@@ -111,6 +111,15 @@ class TempStorage {
         : (this.data[collectionName] = { [id]: doc })
     }
   }
+
+  async query({ command, adapter, conditionals }) {
+    const { collectionName } = command
+    const queriedDocuments = await adapter.queryRecords(
+      collectionName,
+      conditionals
+    )
+    this.data[collectionName] = docArrayToObject(queriedDocuments)
+  }
 }
 
 export default TempStorage

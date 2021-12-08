@@ -10,10 +10,7 @@ const usePeekAll = (query, config) => {
   useEffect(() => {
     const peekAllFetcher = async () => {
       const dbData = await peekAll({ query, runtimeStorage, models })
-      console.log(
-        '🚀 ~ file: usePeekAll.js ~ line 13 ~ peekAllFetcher ~ dbData',
-        dbData
-      )
+
       const constructedData = construct(dbData, query, models)
       setDocuments(constructedData)
     }

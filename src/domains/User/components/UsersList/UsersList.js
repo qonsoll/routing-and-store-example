@@ -1,5 +1,5 @@
 import UserSimpleView from '../UserSimpleView'
-import { useFindAll, useFindRecord } from 'services/qonsoll-data/Store'
+import { useFindAll, useQuery } from 'services/qonsoll-data/Store'
 
 const query = `query {
     users {
@@ -17,13 +17,7 @@ const query = `query {
     }
 }`
 
-const peekQuery = `query {
-    users(id: "7WB6kbZSPbrzuJJlmOwQ") {
-      firstName,
-      lastName,
-      age
-    }
-}`
+const conditionals = [['age', '==', '30']]
 
 const UsersList = () => {
   const [data, loading] = useFindAll(query, {
@@ -31,12 +25,19 @@ const UsersList = () => {
     // forceIntervalRefresh: true,
     // construct: true
   })
-  const [document] = useFindRecord(peekQuery, {
-    fetchInterval: 120,
-    forceIntervalRefresh: true,
-    construct: true
-  })
-
+  // const [document] = useFindRecord(peekQuery, {
+  //   fetchInterval: 120,
+  //   forceIntervalRefresh: true,
+  //   construct: true
+  // })
+  const [documents] = useQuery(
+    query,
+    {
+      construct: true
+    },
+    conditionals
+  )
+  console.log(documents)
   // const [documents] = usePeekAll(query)
   // console.log('🚀 ~ file: UsersList.js ~ line 29 ~ UsersList ~ data', data)
   // console.log('result document ---> ', document)

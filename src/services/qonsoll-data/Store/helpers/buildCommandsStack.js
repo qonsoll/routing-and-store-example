@@ -22,6 +22,10 @@ const relationshipType = {
   findRecord: {
     belongsTo: 'findBelongsTo',
     hasMany: 'findHasMany'
+  },
+  query: {
+    belongsTo: 'findBelongsTo',
+    hasMany: 'findHasMany'
   }
 }
 
