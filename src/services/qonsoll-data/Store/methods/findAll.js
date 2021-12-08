@@ -4,10 +4,10 @@ import construct from './construct'
 
 /**
  * Method helps to find all data in DB by query
- * @param {*} query graphql like query
- * @param {*} adapter DB adapter that will help to make requests
- * @param {*} models models collection to check relationships
- * @param {*} options { construct } - choose the way how to receive response
+ * @param {string} query graphql like query
+ * @param {object} adapter DB adapter that will help to make requests
+ * @param {object} models models collection to check relationships
+ * @param {object} options { construct } - choose the way how to receive response
  * @returns {object}
  */
 const findAll = async ({ query, adapter, models, options }) => {
