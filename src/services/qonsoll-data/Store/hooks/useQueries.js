@@ -1,7 +1,7 @@
-import { usePeekAll, usePeekRecord, useFindAll, useFindRecord } from '../hooks'
+import { peekAll, peekRecord, findAll, findRecord, construct } from '../methods'
 
 const useQueries = () => {
-  return { usePeekAll, usePeekRecord, useFindAll, useFindRecord }
+  return { peekAll, peekRecord, findAll, findRecord, construct }
 }
 
 export default useQueries

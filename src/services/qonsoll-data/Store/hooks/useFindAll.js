@@ -126,7 +126,7 @@ const useFindAll = (query, options) => {
       let constructedData = {}
 
       // Peek or fetch depends on conditions
-      if (isQueryCached && !isRefreshAllowed) {
+      if (isQueryCached && !isRefreshAllowed && options?.disablePeek !== true) {
         constructedData = await peekCachedData().catch((err) => {
           console.error(err)
           setError(err)
@@ -153,6 +153,7 @@ const useFindAll = (query, options) => {
       fetchDBData,
       getRefreshStatus,
       options.fetchInterval,
+      options.disablePeek,
       peekCachedData,
       query,
       runtimeStorage,
