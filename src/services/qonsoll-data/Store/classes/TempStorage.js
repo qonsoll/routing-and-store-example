@@ -120,6 +120,39 @@ class TempStorage {
     )
     this.data[collectionName] = docArrayToObject(queriedDocuments)
   }
+
+  filter({ command, runtimeStorage, conditionals }) {
+    const conditionalsOperators = {
+      '>': (field, value) => (field > value ? true : false),
+      '>=': (field, value) => (field >= value ? true : false),
+      '<': (field, value) => (field < value ? true : false),
+      '<=': (field, value) => (field <= value ? true : false),
+      '!=': (field, value) => (field !== value ? true : false),
+      '==': (field, value) => (field === value ? true : false)
+    }
+
+    const { collectionName, context } = command
+
+    if (!context) {
+      const documents = runtimeStorage.get(`structured.${collectionName}`)
+      if (documents) {
+        this.data[collectionName] = {}
+      }
+      Object.keys(documents).forEach((id) => {
+        conditionals.forEach((conditional) => {
+          const [conditionalField, conditionalOperator, conditionalValue] =
+            conditional
+          if (
+            conditionalsOperators[conditionalOperator](
+              documents[id][conditionalField],
+              conditionalValue
+            )
+          )
+            this.data[collectionName][id] = documents[id]
+        })
+      })
+    }
+  }
 }
 
 export default TempStorage

@@ -26,6 +26,10 @@ const relationshipType = {
   query: {
     belongsTo: 'findBelongsTo',
     hasMany: 'findHasMany'
+  },
+  filter: {
+    belongsTo: 'peekBelongsTo',
+    hasMany: 'peekHasMany'
   }
 }
 

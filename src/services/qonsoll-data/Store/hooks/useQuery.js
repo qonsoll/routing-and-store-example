@@ -1,5 +1,5 @@
 import useStore from '../useStore'
-import { fetchByQuery, peekAll, construct } from '../methods'
+import { fetchByQuery, filter, construct } from '../methods'
 import { useState, useEffect, useCallback } from 'react'
 import md5 from 'md5'
 
@@ -21,13 +21,16 @@ const useQuery = (query, options, conditionals) => {
   // Method that helps to peek cached data if them exist and structure
   // in different ways (as in DB, or nested object)
   const peekCachedData = useCallback(async () => {
-    // Using peekAll algorithm based on runtimeStorage peek method
-    const cachedData = await peekAll({ query, runtimeStorage, models }).catch(
-      (err) => {
-        console.error(err)
-        setError(err)
-      }
-    )
+    // Using filter algorithm based on runtimeStorage peek method with firestore like conditionals
+    const cachedData = await filter({
+      query,
+      runtimeStorage,
+      models,
+      conditionals
+    }).catch((err) => {
+      console.error(err)
+      setError(err)
+    })
 
     // Decide how to return data (as in DB or as nested object)
     const constructedData =
@@ -36,7 +39,7 @@ const useQuery = (query, options, conditionals) => {
         : cachedData
 
     return constructedData
-  }, [models, query, runtimeStorage, options.construct])
+  }, [models, query, runtimeStorage, options.construct, conditionals])
 
   // Method helps to fetch data from the database
   const fetchDBData = useCallback(async () => {
