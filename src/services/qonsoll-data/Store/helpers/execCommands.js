@@ -1,5 +1,12 @@
 import { TempStorage } from '../classes'
 
+/**
+ * Method executes commands created by buildCommandsStack method
+ * @param {array} commands array of commands
+ * @param {object} adapter adapter to make requests to the database
+ * @param {object} runtimeStorage instance of runtimeStorage
+ * @returns {object}
+ */
 const execCommands = async ({
   commands,
   adapter,
