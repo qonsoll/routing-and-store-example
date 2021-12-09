@@ -1,19 +1,40 @@
-import { Controller } from 'react-hook-form'
+import { useEffect, useState } from 'react'
+import { Form } from 'antd'
 import { Select } from '@qonsoll/react-design'
+import { useFindAll } from 'services/qonsoll-data/Store'
 
-const CountrySelect = ({ control }) => {
-  const countries = [
-    { label: 'Ukraine', value: 'ukraine' },
-    { label: 'Norway', value: 'norway' }
-  ]
+const query = `query {
+      countries {
+        id
+        name
+      }
+  }`
+
+const CountrySelect = () => {
+  const [countriesTransformed, setCountriesTransformed] = useState([])
+  const [countries, loading, error] = useFindAll(query)
+
+  useEffect(() => {
+    if (Boolean(countries?.length)) {
+      const citiesTransformed = countries.map((city) => ({
+        label: city.name,
+        value: city.id
+      }))
+      citiesTransformed && setCountriesTransformed(citiesTransformed)
+    }
+  }, [countries])
+
   return (
-    <Controller
-      name="country"
-      control={control}
-      render={({ field }) => (
-        <Select {...field} options={countries} placeholder="Choose country" />
-      )}
-    />
+    <>
+      {error ? error.toString() : null}
+      <Form.Item name="country">
+        <Select
+          loading={loading}
+          options={countriesTransformed}
+          placeholder="Choose country"
+        />
+      </Form.Item>
+    </>
   )
 }
 

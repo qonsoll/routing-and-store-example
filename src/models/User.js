@@ -12,8 +12,8 @@ const validationSchema = yup.object().shape({
 const User = model(
   'user',
   {
+    firstName: attr('string'),
     lastName: attr('string'),
-    age: attr('number'),
     birthDate: attr('date'),
     address: belongsTo('address'),
     interests: hasMany('interest')

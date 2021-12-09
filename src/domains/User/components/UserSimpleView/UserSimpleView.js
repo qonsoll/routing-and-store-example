@@ -8,12 +8,16 @@ import {
   Text,
   Button
 } from '@qonsoll/react-design'
+import { useHistory } from 'react-router-dom'
 // import { useUserActions } from '../../hooks'
 
 const UserSimpleView = ({ id, firstName, lastName, age }) => {
+  const history = useHistory()
   // const { remove, redirectToEdit, destroy, update } = useUserActions(id)
   const remove = () => {}
-  const redirectToEdit = () => {}
+  const redirectToEdit = () => {
+    history.push(`/users/${id}/edit`)
+  }
   const destroy = () => {}
   return (
     <Card mb={3}>

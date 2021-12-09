@@ -20,7 +20,7 @@ const query = `query {
 const conditionals = [['age', '==', '30']]
 
 const UsersList = () => {
-  const [data, loading] = useFindAll(query, {
+  const [users, loading] = useFindAll(query, {
     // fetchInterval: 120,
     // forceIntervalRefresh: true,
     // construct: true
@@ -30,14 +30,14 @@ const UsersList = () => {
   //   forceIntervalRefresh: true,
   //   construct: true
   // })
-  const [documents] = useQuery(
-    query,
-    {
-      construct: true
-    },
-    conditionals
-  )
-  console.log(documents)
+  // const [documents] = useQuery(
+  //   query,
+  //   {
+  //     construct: true
+  //   },
+  //   conditionals
+  // )
+  // console.log(documents)
   // const [documents] = usePeekAll(query)
   // console.log('🚀 ~ file: UsersList.js ~ line 29 ~ UsersList ~ data', data)
   // console.log('result document ---> ', document)
@@ -45,7 +45,7 @@ const UsersList = () => {
   return (
     <div>
       {loading ? <div>Loading...</div> : null}
-      {data?.users?.map((user) => {
+      {users?.map((user) => {
         const { id, firstName, lastName, age } = user
         return (
           <UserSimpleView

@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react'
 import {
   Container,
   Row,
@@ -9,8 +10,13 @@ import {
 import InterestSimpleView from '../InterestSimpleView'
 import InterestSimpleForm from '../InterestSimpleForm'
 
-const InterestsList = ({ title }) => {
-  const interests = []
+const InterestsList = ({ title, interests }) => {
+  const [state, setState] = useState([])
+
+  useEffect(() => {
+    interests && setState(interests)
+  }, [interests])
+
   return (
     <Container>
       {title ? (
@@ -30,13 +36,13 @@ const InterestsList = ({ title }) => {
           </Col>
         </Row>
       ) : null}
-      {!interests.length ? (
+      {!interests?.length ? (
         <Row>
           <Col>No interests</Col>
         </Row>
       ) : null}
-      {interests.map((interest) => (
-        <InterestSimpleView interest={interest} />
+      {state?.map((interest) => (
+        <InterestSimpleView key={interest?.id} interest={interest} />
       ))}
     </Container>
   )

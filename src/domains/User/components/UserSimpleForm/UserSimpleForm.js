@@ -1,38 +1,26 @@
+import { useEffect } from 'react'
 import { Container, Row, Col, Input, Title } from '@qonsoll/react-design'
-import { Button, DatePicker } from 'antd'
-import { useForm, Controller } from 'react-hook-form'
-import { useMutations } from 'services/qonsoll-data/Store'
+import { Form, DatePicker } from 'antd'
+import { useMutations, useModel } from 'services/qonsoll-data/Store'
+import moment from 'moment'
 
-const UserSimpleForm = ({ title, form, onValuesChange }) => {
-  const { add, remove, update } = useMutations()
+const UserSimpleForm = ({ title, user }) => {
+  const [userModel] = useModel('user')
+  const [form] = Form.useForm()
 
-  const { control, handleSubmit } = useForm({
-    defaultValues: {
-      firstName: '',
-      select: {}
-    }
-  })
-
-  const onAdd = (data) =>
-    add('users', {
-      firstName: data.firstName,
-      lastName: data.lastName,
-      birthData: data.birthData,
-      address: 'address1',
-      interests: ['interest1', 'interest2', 'interest3']
-    })
-  const onRemove = () => remove('If0ZCZ9ZFYEiJCwC2DX7', 'users')
-  const onUpdate = (data) =>
-    update('If0ZCZ9ZFYEiJCwC2DX7', 'users', {
-      firstName: data.firstName,
-      lastName: data.lastName,
-      birthData: data.birthData,
-      address: 'address1',
-      interests: ['interest1', 'interest2', 'interest3']
-    })
+  useEffect(() => {
+    console.log('user ->', user)
+    user
+      ? form.setFieldsValue({
+          firstName: user?.firstName,
+          lastName: user?.lastName,
+          birthDate: moment(user?.birthDate)
+        })
+      : form.setFieldsValue(userModel.defaultValues)
+  }, [form, user, userModel?.defaultValues])
 
   return (
-    <form onSubmit={handleSubmit(onAdd)}>
+    <Form form={form} onFinish={() => {}}>
       <Container mb={4}>
         {title ? (
           <Row mb={3}>
@@ -43,54 +31,29 @@ const UserSimpleForm = ({ title, form, onValuesChange }) => {
         ) : null}
         <Row mb={3}>
           <Col>
-            <Controller
-              name="firstName"
-              control={control}
-              render={({ field }) => (
-                <Input {...field} placeholder="Enter first name" />
-              )}
-            />
+            <Form.Item name="firstName">
+              <Input placeholder="Enter first name" />
+            </Form.Item>
           </Col>
           <Col>
-            <Controller
-              name="lastName"
-              control={control}
-              render={({ field }) => (
-                <Input {...field} placeholder="Enter last name" />
-              )}
-            />
+            <Form.Item name="lastName">
+              <Input placeholder="Enter last name" />
+            </Form.Item>
           </Col>
         </Row>
         <Row>
           <Col>
-            <Controller
-              name="birthData"
-              control={control}
-              render={({ field }) => (
-                <DatePicker {...field} placeholder="Enter birthdate" />
-              )}
-            />
-          </Col>
-        </Row>
-        <Row mt={3}>
-          <Col>
-            <Button onClick={handleSubmit(onAdd)} type="primary">
-              Add
-            </Button>
-          </Col>
-          <Col>
-            <Button onClick={handleSubmit(onRemove)} type="primary">
-              Remove
-            </Button>
-          </Col>
-          <Col>
-            <Button onClick={handleSubmit(onUpdate)} type="primary">
-              Update
-            </Button>
+            <Form.Item name="birthDate">
+              <DatePicker
+                style={{ width: '100%' }}
+                placeholder="Enter birth date"
+                format="YYYY-MM-DD"
+              />
+            </Form.Item>
           </Col>
         </Row>
       </Container>
-    </form>
+    </Form>
   )
 }
 

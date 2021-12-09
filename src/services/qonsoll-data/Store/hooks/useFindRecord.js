@@ -2,6 +2,8 @@ import { useState, useEffect, useCallback } from 'react'
 import useStore from '../useStore'
 import { findRecord, peekRecord, construct } from '../methods'
 import md5 from 'md5'
+import { graphQlQueryToJson } from 'graphql-query-to-json'
+import pluralize from 'pluralize'
 
 const useFindRecord = (query, options) => {
   const { runtimeStorage, defaultAdapter, models } = useStore()
@@ -31,7 +33,7 @@ const useFindRecord = (query, options) => {
         : cachedData
 
     return constructedData
-  }, [models, query, runtimeStorage, options.construct])
+  }, [models, query, runtimeStorage, options?.construct])
 
   // Method helps to fetch data from the database
   const fetchDBData = useCallback(async () => {
@@ -55,7 +57,7 @@ const useFindRecord = (query, options) => {
         : dbData
 
     return { dbData, constructedData }
-  }, [models, query, defaultAdapter, options.construct])
+  }, [models, query, defaultAdapter, options?.construct])
 
   // Method helps to update current state of runtimeStorage
   const updateCache = useCallback(
@@ -108,6 +110,9 @@ const useFindRecord = (query, options) => {
     async (params) => {
       // Generating md5 hash from query
       const queryHash = md5(query)
+      const queryCollection = pluralize(
+        Object.keys(graphQlQueryToJson(query)?.query)[0]
+      )
 
       // Check if there are query meta data in runtime storage
       const isQueryCached = Boolean(runtimeStorage.get(`queries.${queryHash}`))
@@ -115,7 +120,7 @@ const useFindRecord = (query, options) => {
       // Check if refresh allowed
       const isRefreshAllowed = getRefreshStatus(
         queryHash,
-        options.fetchInterval
+        options?.fetchInterval
       )
 
       let constructedData = {}
@@ -126,6 +131,7 @@ const useFindRecord = (query, options) => {
           console.error(err)
           setError(err)
         })
+        constructedData = constructedData?.[queryCollection]?.[0]
       } else {
         // Don't show spinner onRefetch
         !params?.disableSpinner && setLoading(true)
@@ -137,7 +143,7 @@ const useFindRecord = (query, options) => {
 
         // Updating cache
         updateCache(queryHash, data?.dbData)
-        constructedData = data.constructedData
+        constructedData = data?.constructedData?.[queryCollection]?.[0]
         !params?.disableSpinner && setLoading(false)
       }
 
@@ -147,8 +153,8 @@ const useFindRecord = (query, options) => {
     [
       fetchDBData,
       getRefreshStatus,
-      options.fetchInterval,
-      options.disablePeek,
+      options?.fetchInterval,
+      options?.disablePeek,
       peekCachedData,
       query,
       runtimeStorage,
@@ -159,22 +165,29 @@ const useFindRecord = (query, options) => {
   // UseEffect helps to fetch data with interval or fetch only once
   useEffect(() => {
     let interval
-    if (options?.forceIntervalRefresh && options?.fetchInterval) {
-      // Initial fetching
-      smartFetch()
 
-      // Interval fetching (will be triggered in fetchInterval seconds)
-      interval = setInterval(() => {
-        smartFetch({ disableSpinner: true })
-      }, options?.fetchInterval * 1000)
-    } else {
-      smartFetch()
+    const fetchWithInterval = async () => {
+      if (options?.forceIntervalRefresh && options?.fetchInterval) {
+        // Initial fetching
+        await smartFetch()
+
+        // Interval fetching (will be triggered in fetchInterval seconds)
+        interval = setInterval(async () => {
+          await smartFetch({ disableSpinner: true })
+        }, options?.fetchInterval * 1000)
+      } else {
+        await smartFetch()
+      }
     }
+    const unsubscribe = fetchWithInterval
+
+    fetchWithInterval()
 
     return () => {
       clearInterval(interval)
+      unsubscribe()
     }
-  }, [options.forceIntervalRefresh, options.fetchInterval, smartFetch])
+  }, [options?.forceIntervalRefresh, options?.fetchInterval, smartFetch])
 
   return [documents, loading, error]
 }

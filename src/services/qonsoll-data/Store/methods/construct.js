@@ -22,7 +22,10 @@ const construct = (data, query, models) => {
     fields &&
       Object.keys(fields).forEach((item) => {
         // If type of field in model is relationship - then we have reference to another db collection document/s
-        if (model?.[item]?.type === 'relationship') {
+        if (
+          model?.[item]?.type === 'relationship' &&
+          typeof fields[item] === 'object'
+        ) {
           // If dataType is belongsTo then we have to extract fields of db document from collection
           // that has name similar to this field's name and has id that is equal to field's value
           // so we recursively call this function for document with
@@ -50,7 +53,7 @@ const construct = (data, query, models) => {
         } else {
           // If type of model field isn't relationship - then we have simple field that will be inside of our object
           // so we just add it to our result object
-          resultObject[item] = dbData[item]
+          resultObject[item] = dbData?.[item]
         }
       })
     return resultObject

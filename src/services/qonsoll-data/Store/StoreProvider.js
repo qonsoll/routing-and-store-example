@@ -16,8 +16,8 @@ const StoreProvider = ({
 
 StoreProvider.propTypes = {
   children: PropTypes.element.isRequired,
-  runtimeStorage: PropTypes.object.isRequired,
-  defaultAdapter: PropTypes.func.isRequired,
+  // runtimeStorage: PropTypes.object.isRequired,
+  defaultAdapter: PropTypes.object.isRequired,
   models: PropTypes.object.isRequired
 }
 

@@ -1,20 +1,20 @@
+import { useEffect } from 'react'
 import { Container, Row, Col, Title } from '@qonsoll/react-design'
-import { useForm } from 'react-hook-form'
+import { Form } from 'antd'
 import { CitySelect } from 'domains/City/components'
 import { CountrySelect } from 'domains/Country/components'
 
-const AddressSimpleForm = ({ title, form, onValuesChange }) => {
-  const { control, handleSubmit } = useForm({
-    defaultValues: {
-      firstName: '',
-      select: {}
-    }
-  })
-
-  const onSubmit = (data) => console.log(data)
-
+const AddressSimpleForm = ({ title, address }) => {
+  const [form] = Form.useForm()
+  useEffect(() => {
+    address &&
+      form.setFieldsValue({
+        city: address?.city?.id,
+        country: address?.country?.id
+      })
+  }, [form, address])
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
+    <Form form={form} onFinish={() => {}}>
       <Container mb={4}>
         {title ? (
           <Row mb={3}>
@@ -25,14 +25,14 @@ const AddressSimpleForm = ({ title, form, onValuesChange }) => {
         ) : null}
         <Row mb={3}>
           <Col>
-            <CountrySelect control={control} />
+            <CountrySelect selectedCountry={address?.country} />
           </Col>
           <Col>
-            <CitySelect control={control} />
+            <CitySelect selectedCity={address?.city} />
           </Col>
         </Row>
       </Container>
-    </form>
+    </Form>
   )
 }
 
