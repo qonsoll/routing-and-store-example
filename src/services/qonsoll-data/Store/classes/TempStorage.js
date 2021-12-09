@@ -1,10 +1,16 @@
 import { docArrayToObject } from '../helpers'
 import { findHasMany } from '../../RuntimeStorage/methods'
 
+/**
+ * @class TempStorage helps to collect data fetched from the DB
+ * This class is using by execCommands
+ */
 class TempStorage {
   constructor() {
     this.data = {}
   }
+
+  // Find all (get collection data)
   async findAll({ command, adapter }) {
     const { collectionName, context } = command
     if (!context) {
@@ -13,9 +19,9 @@ class TempStorage {
         this.data[collectionName] = docArrayToObject(documents)
       }
     }
-    // TODO handle nested collection (not id ref)
   }
 
+  // Find belongsTo relationship data
   async findBelongsTo({ command, adapter }) {
     const { field, collectionName, context } = command
     const promises = []
@@ -30,6 +36,7 @@ class TempStorage {
     this.data[collectionName] = docArrayToObject(documents)
   }
 
+  // Find hasMany relationship data
   async findHasMany({ command, adapter }) {
     const { field, collectionName, context } = command
     const promises = []

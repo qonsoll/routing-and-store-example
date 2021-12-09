@@ -1,3 +1,8 @@
+/**
+ * Deep read with async callbacks
+ * @param {*} obj object to iterate
+ * @param {*} callback async callback method
+ */
 const traverseQuery = async (obj, callback) => {
   const path = []
   const deepRead = async (obj, path) => {
