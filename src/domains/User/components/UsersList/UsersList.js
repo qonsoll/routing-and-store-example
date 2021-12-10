@@ -42,6 +42,8 @@ const UsersList = () => {
   // console.log('🚀 ~ file: UsersList.js ~ line 29 ~ UsersList ~ data', data)
   // console.log('result document ---> ', document)
 
+  console.log(users)
+
   return (
     <div>
       {loading ? <div>Loading...</div> : null}

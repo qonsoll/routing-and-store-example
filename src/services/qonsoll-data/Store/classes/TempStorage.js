@@ -1,5 +1,6 @@
 import { docArrayToObject } from '../helpers'
 import { findHasMany } from '../../RuntimeStorage/methods'
+import { validate } from '../helpers'
 
 /**
  * @class TempStorage helps to collect data fetched from the DB
@@ -12,6 +13,11 @@ class TempStorage {
 
   // Find all (get collection data)
   async findAll({ command, adapter }) {
+    validate('findAll', {
+      command,
+      adapter
+    })
+
     const { collectionName, context } = command
     if (!context) {
       const documents = await adapter.findAll(collectionName)
@@ -23,6 +29,11 @@ class TempStorage {
 
   // Find belongsTo relationship data
   async findBelongsTo({ command, adapter }) {
+    validate('findBelongsTo', {
+      command,
+      adapter
+    })
+
     const { field, collectionName, context } = command
     const promises = []
     const contextIds = this.data?.[context] && Object.keys(this.data[context])
@@ -40,6 +51,11 @@ class TempStorage {
 
   // Find hasMany relationship data
   async findHasMany({ command, adapter }) {
+    validate('findHasMany', {
+      command,
+      adapter
+    })
+
     const { field, collectionName, context } = command
     const promises = []
     const contextIds = Object.keys(this.data[context])
@@ -54,6 +70,11 @@ class TempStorage {
   }
 
   peekAll({ command, runtimeStorage }) {
+    validate('peekAll', {
+      command,
+      runtimeStorage
+    })
+
     const { collectionName, context } = command
     if (!context) {
       const documents = runtimeStorage.get(`structured.${collectionName}`)
@@ -65,6 +86,11 @@ class TempStorage {
   }
 
   peekBelongsTo({ command, runtimeStorage }) {
+    validate('peekBelongsTo', {
+      command,
+      runtimeStorage
+    })
+
     const { field, collectionName, context } = command
     const contextIds =
       (this.data?.[context] && Object.keys(this.data[context])) || 0
@@ -82,6 +108,11 @@ class TempStorage {
   }
 
   peekHasMany({ command, runtimeStorage }) {
+    validate('peekHasMany', {
+      command,
+      runtimeStorage
+    })
+
     const { field, collectionName, context } = command
     const contextIds =
       (this.data?.[context] && Object.keys(this.data[context])) || 0
@@ -100,6 +131,11 @@ class TempStorage {
   }
 
   peekRecord({ command, runtimeStorage }) {
+    validate('peekRecord', {
+      command,
+      runtimeStorage
+    })
+
     const { collectionName, args } = command
     const { id } = args
     const doc = runtimeStorage.get(`structured.${collectionName}.${id}`)
@@ -111,6 +147,11 @@ class TempStorage {
   }
 
   async findRecord({ command, adapter }) {
+    validate('findRecord', {
+      command,
+      adapter
+    })
+
     const { collectionName, args } = command
     const { id } = args
     const doc = await adapter.findRecord(collectionName, id)
@@ -122,6 +163,12 @@ class TempStorage {
   }
 
   async query({ command, adapter, conditionals }) {
+    validate('query', {
+      command,
+      adapter,
+      conditionals
+    })
+
     const { collectionName } = command
     const queriedDocuments = await adapter.queryRecords(
       collectionName,
@@ -140,6 +187,12 @@ class TempStorage {
       '==': (field, value) => (field === value ? true : false)
     }
 
+    validate('filter', {
+      command,
+      runtimeStorage,
+      conditionals
+    })
+
     const { collectionName, context } = command
 
     if (!context) {
@@ -147,19 +200,27 @@ class TempStorage {
       if (documents) {
         this.data[collectionName] = {}
       }
-      Object.keys(documents).forEach((id) => {
-        conditionals.forEach((conditional) => {
-          const [conditionalField, conditionalOperator, conditionalValue] =
-            conditional
-          if (
-            conditionalsOperators[conditionalOperator](
-              documents[id][conditionalField],
+      documents &&
+        Object.keys(documents).forEach((id) => {
+          conditionals.forEach((conditional) => {
+            const [conditionalField, conditionalOperator, conditionalValue] =
+              conditional
+
+            validate('filter', {
+              conditionalField,
+              conditionalOperator,
               conditionalValue
+            })
+
+            if (
+              conditionalsOperators[conditionalOperator](
+                documents[id][conditionalField],
+                conditionalValue
+              )
             )
-          )
-            this.data[collectionName][id] = documents[id]
+              this.data[collectionName][id] = documents[id]
+          })
         })
-      })
     }
   }
 }
