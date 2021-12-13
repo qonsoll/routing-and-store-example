@@ -27,6 +27,44 @@ class TempStorage {
     }
   }
 
+  // Fetch all
+  async fetchAll({ command, adapter }) {
+    validate('fetchAll', {
+      command,
+      adapter
+    })
+
+    const { collectionName, context } = command
+    if (!context) {
+      const documents = await adapter.findAll(collectionName)
+      if (documents.length) {
+        this.data[collectionName] = docArrayToObject(documents)
+      }
+    }
+  }
+
+  // Fetch record by id
+  async fetchRecord({ command, adapter }) {
+    validate('fetchRecord', {
+      command,
+      adapter
+    })
+
+    const { collectionName, args } = command
+    validate('fetchRecord', {
+      collectionName,
+      args
+    })
+
+    const { id } = args
+    const doc = await adapter.findRecord(collectionName, id)
+    if (doc) {
+      this.data[collectionName]
+        ? (this.data[collectionName][id] = doc)
+        : (this.data[collectionName] = { [id]: doc })
+    }
+  }
+
   // Find belongsTo relationship data
   async findBelongsTo({ command, adapter }) {
     validate('findBelongsTo', {
@@ -146,7 +184,7 @@ class TempStorage {
     }
   }
 
-  async findRecord({ command, adapter }) {
+  async fetchRecord({ command, adapter }) {
     validate('findRecord', {
       command,
       adapter

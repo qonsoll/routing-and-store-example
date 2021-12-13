@@ -33,6 +33,14 @@ const relationshipType = {
     belongsTo: 'findBelongsTo',
     hasMany: 'findHasMany'
   },
+  fetchAll: {
+    belongsTo: 'findBelongsTo',
+    hasMany: 'findHasMany'
+  },
+  fetchRecord: {
+    belongsTo: 'findBelongsTo',
+    hasMany: 'findHasMany'
+  },
   query: {
     belongsTo: 'findBelongsTo',
     hasMany: 'findHasMany'
