@@ -40,16 +40,17 @@ const construct = (data, query, models) => {
           // that has name similar to this field's name and its' id is in array of current field value
           // so we call this function for every db entry with id of fields' value array
           if (model?.[item]?.dataType === 'hasMany')
-            resultObject[item] = dbData?.[item].map((hasManyId) =>
-              defineObjectAttributes(
-                defineFieldType(
-                  fields?.[item],
-                  models?.[pluralize.singular(item)]?.fields
-                ),
-                models?.[pluralize.singular(item)]?.fields,
-                data?.[item]?.[hasManyId] // TODO change database interaction to real one
-              )
-            )
+            resultObject[item] =
+              dbData?.[item]?.map((hasManyId) =>
+                defineObjectAttributes(
+                  defineFieldType(
+                    fields?.[item],
+                    models?.[pluralize.singular(item)]?.fields
+                  ),
+                  models?.[pluralize.singular(item)]?.fields,
+                  data?.[item]?.[hasManyId] // TODO change database interaction to real one
+                )
+              ) || null
         } else {
           // If type of model field isn't relationship - then we have simple field that will be inside of our object
           // so we just add it to our result object

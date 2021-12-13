@@ -10,6 +10,7 @@ const invalid = (key) => {
 }
 
 const validate = (method, values) => {
+  console.log(values)
   const isValid = Object.entries(values).reduce(
     (valid, parameter) => {
       const [key, value] = parameter
