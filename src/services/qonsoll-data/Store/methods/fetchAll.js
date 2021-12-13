@@ -16,7 +16,6 @@ const fetchAll = async ({ query, adapter, models, options }) => {
 
   // Building commands order (information what to call, when and with what payload)
   const commands = buildCommandsStack(queryJSON.query, 'fetchAll', models)
-  console.log(commands)
 
   // Executing commands one-by-one and making requests to the DB throw adapter
   const data = await execCommands({ commands, adapter })

@@ -1,9 +1,9 @@
 import UserSimpleView from '../UserSimpleView'
 import {
-  useFindAll,
-  useQuery,
-  useFetchAll,
-  useFetchRecord
+  useFindAll
+  // useQuery,
+  // useFetchAll,
+  // useFetchRecord
 } from 'services/qonsoll-data/Store'
 
 const query = `query {
@@ -22,33 +22,35 @@ const query = `query {
     }
 }`
 
-const recordQuery = `query {
-    users(id: "7WB6kbZSPbrzuJJlmOwQ") {
-      id,
-      firstName,
-      lastName,
-      age,
-      address {
-        city,
-        country
-      },
-      interests {
-        name
-      }
-    }
-}`
+// const recordQuery = `query {
+//     users(id: "7WB6kbZSPbrzuJJlmOwQ") {
+//       id,
+//       firstName,
+//       lastName,
+//       age,
+//       address {
+//         city,
+//         country
+//       },
+//       interests {
+//         name
+//       }
+//     }
+// }`
 
-const conditionals = [['age', '==', '30']]
+// const conditionals = [['age', '==', '30']]
 
 const UsersList = () => {
-  const [users, loading] = useFindAll(query, {
-    // fetchInterval: 120,
-    // forceIntervalRefresh: true,
-    // construct: true
-  })
+  // const [users, loading] = useFindAll(query, {
+  // fetchInterval: 120,
+  // forceIntervalRefresh: true,
+  // construct: true
+  // })
 
-  const [documents] = useFetchAll(query)
-  const [document] = useFetchRecord(recordQuery)
+  const [users, loading] = useFindAll(query)
+  console.log('🚀 ~ file: UsersList.js ~ line 51 ~ UsersList ~ users', users)
+
+  // const [document] = useFetchRecord(recordQuery)
   // const [document] = useFindRecord(peekQuery, {
   //   fetchInterval: 120,
   //   forceIntervalRefresh: true,
@@ -65,8 +67,6 @@ const UsersList = () => {
   // const [documents] = usePeekAll(query)
   // console.log('🚀 ~ file: UsersList.js ~ line 29 ~ UsersList ~ data', data)
   // console.log('result document ---> ', document)
-
-  console.log(document)
 
   return (
     <div>

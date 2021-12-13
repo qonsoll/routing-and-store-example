@@ -1,23 +1,21 @@
 import { useEffect } from 'react'
 import { Container, Row, Col, Input, Title } from '@qonsoll/react-design'
 import { Form, DatePicker } from 'antd'
-import { useMutations, useModel } from 'services/qonsoll-data/Store'
+import { useModel } from 'services/qonsoll-data/Store'
 import moment from 'moment'
 
-const UserSimpleForm = ({ title, user }) => {
+const UserSimpleForm = ({ id, title, data, form }) => {
   const [userModel] = useModel('user')
-  const [form] = Form.useForm()
 
   useEffect(() => {
-    console.log('user ->', user)
-    user
+    data
       ? form.setFieldsValue({
-          firstName: user?.firstName,
-          lastName: user?.lastName,
-          birthDate: moment(user?.birthDate)
+          firstName: data?.firstName,
+          lastName: data?.lastName,
+          birthDate: moment(data?.birthDate)
         })
-      : form.setFieldsValue(userModel.defaultValues)
-  }, [form, user, userModel?.defaultValues])
+      : form.setFieldsValue(userModel?.defaultValues)
+  }, [form, data, userModel?.defaultValues])
 
   return (
     <Form form={form} onFinish={() => {}}>

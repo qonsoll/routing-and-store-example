@@ -4,8 +4,7 @@ import { Form } from 'antd'
 import { CitySelect } from 'domains/City/components'
 import { CountrySelect } from 'domains/Country/components'
 
-const AddressSimpleForm = ({ title, address }) => {
-  const [form] = Form.useForm()
+const AddressSimpleForm = ({ title, address, form }) => {
   useEffect(() => {
     address &&
       form.setFieldsValue({

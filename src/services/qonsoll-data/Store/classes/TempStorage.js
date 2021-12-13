@@ -184,26 +184,26 @@ class TempStorage {
     }
   }
 
-  async fetchRecord({ command, adapter }) {
-    validate('findRecord', {
-      command,
-      adapter
-    })
+  // async fetchRecord({ command, adapter }) {
+  //   validate('findRecord', {
+  //     command,
+  //     adapter
+  //   })
 
-    const { collectionName, args } = command
-    validate('findRecord', {
-      collectionName,
-      args
-    })
+  //   const { collectionName, args } = command
+  //   validate('findRecord', {
+  //     collectionName,
+  //     args
+  //   })
 
-    const { id } = args
-    const doc = await adapter.findRecord(collectionName, id)
-    if (doc) {
-      this.data[collectionName]
-        ? (this.data[collectionName][id] = doc)
-        : (this.data[collectionName] = { [id]: doc })
-    }
-  }
+  //   const { id } = args
+  //   const doc = await adapter.findRecord(collectionName, id)
+  //   if (doc) {
+  //     this.data[collectionName]
+  //       ? (this.data[collectionName][id] = doc)
+  //       : (this.data[collectionName] = { [id]: doc })
+  //   }
+  // }
 
   async query({ command, adapter, conditionals }) {
     validate('query', {

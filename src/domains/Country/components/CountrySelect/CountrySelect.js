@@ -16,9 +16,9 @@ const CountrySelect = () => {
 
   useEffect(() => {
     if (Boolean(countries?.length)) {
-      const citiesTransformed = countries.map((city) => ({
-        label: city.name,
-        value: city.id
+      const citiesTransformed = countries.map((country) => ({
+        label: country.name,
+        value: country.id
       }))
       citiesTransformed && setCountriesTransformed(citiesTransformed)
     }
