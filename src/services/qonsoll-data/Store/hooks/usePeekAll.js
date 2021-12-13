@@ -2,8 +2,8 @@ import useStore from '../useStore'
 import { peekAll, construct } from '../methods'
 import { useState, useEffect } from 'react'
 
-const usePeekAll = (query, config) => {
-  const { runtimeStorage, adapter, models } = useStore()
+const usePeekAll = (query, config, disabled) => {
+  const { runtimeStorage, models } = useStore()
   const [error] = useState(null)
   const [documents, setDocuments] = useState([])
 
@@ -14,8 +14,8 @@ const usePeekAll = (query, config) => {
       const constructedData = construct(dbData, query, models)
       setDocuments(constructedData)
     }
-    peekAllFetcher()
-  }, [models, query, runtimeStorage, adapter])
+    if (!disabled) peekAllFetcher()
+  }, [models, query, runtimeStorage, disabled])
 
   return [documents, error]
 }

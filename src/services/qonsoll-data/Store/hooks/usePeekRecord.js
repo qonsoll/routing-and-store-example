@@ -2,7 +2,7 @@ import useStore from '../useStore'
 import { peekRecord, construct } from '../methods'
 import { useState, useEffect } from 'react'
 
-const usePeekRecord = (query, config) => {
+const usePeekRecord = (query, config, disabled) => {
   const { runtimeStorage, models } = useStore()
   const [error] = useState(null)
   const [document, setDocuments] = useState([])
@@ -13,8 +13,8 @@ const usePeekRecord = (query, config) => {
       const constructedData = construct(data, query, models)
       setDocuments(constructedData)
     }
-    peekRecordFetcher()
-  }, [models, query, runtimeStorage])
+    if (!disabled) peekRecordFetcher()
+  }, [models, query, runtimeStorage, disabled])
 
   return [document, error]
 }
