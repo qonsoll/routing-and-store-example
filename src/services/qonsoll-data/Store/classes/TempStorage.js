@@ -153,6 +153,11 @@ class TempStorage {
     })
 
     const { collectionName, args } = command
+    validate('findRecord', {
+      collectionName,
+      args
+    })
+
     const { id } = args
     const doc = await adapter.findRecord(collectionName, id)
     if (doc) {

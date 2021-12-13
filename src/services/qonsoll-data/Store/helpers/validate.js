@@ -21,11 +21,11 @@ const validateArray = (valid, key, value) => {
     if (typeof arrayItem === 'object') {
       traverse(arrayItem).forEach(function () {
         // If some key has undefined or null value return his key
-        if (!this.node) valid = invalid(this.key)
+        if (this.node === undefined) valid = invalid(this.key)
       })
     }
     // If validated item is simple value and his value is false return his key
-    if (!arrayItem) {
+    if (arrayItem === undefined) {
       valid = invalid(key)
       return valid
     }
@@ -47,7 +47,7 @@ const validate = (method, values) => {
       // If value is array call function that validate array
       if (Array.isArray(value)) valid = validateArray(valid, key, value)
       // If value is simple and false call function which return invalid value
-      else if (!value) {
+      else if (value === undefined) {
         valid = invalid(key)
         return valid
       }
@@ -57,7 +57,7 @@ const validate = (method, values) => {
     { validated: true }
   )
 
-  // Handling errors and display her
+  // Handling errors and display their
   try {
     if (!isValid.validated)
       throw new Error(
