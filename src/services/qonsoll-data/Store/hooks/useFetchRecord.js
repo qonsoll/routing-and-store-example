@@ -30,7 +30,7 @@ const useFetchRecord = (query, config, disabled) => {
     if (!disabled) recordFetcher()
   }, [models, query, defaultAdapter, disabled])
 
-  return [document, error]
+  return [document, loading, error]
 }
 
 export default useFetchRecord
