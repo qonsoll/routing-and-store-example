@@ -4,7 +4,7 @@ import { findAll, peekAll, construct } from '../methods'
 import md5 from 'md5'
 import { graphQlQueryToJson } from 'graphql-query-to-json'
 import pluralize from 'pluralize'
-
+import { validate } from '../helpers'
 /**
  * Method helps to find all data by query in cache or in DB
  * @param {string} query graphql like query
@@ -151,7 +151,7 @@ const useFindAll = (query, options) => {
         constructedData = data?.constructedData?.[queryCollection]
         !params?.disableSpinner && setLoading(false)
       }
-
+      validate('useFindAll', { constructedData })
       // Updating local state
       setDocuments(constructedData)
     },

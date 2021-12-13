@@ -1,4 +1,4 @@
-import { validate } from '../../Store/helpers'
+import { validate } from '../helpers'
 
 const findHasMany = (runtimeStorage, path, ids) => {
   const result = []
