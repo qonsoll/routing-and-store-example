@@ -1,6 +1,7 @@
 import UserSimpleView from '../UserSimpleView'
 import {
-  useFindAll
+  useFindAll,
+  useFindRecord
   // useQuery,
   // useFetchAll,
   // useFetchRecord
@@ -22,21 +23,21 @@ const query = `query {
     }
 }`
 
-// const recordQuery = `query {
-//     users(id: "7WB6kbZSPbrzuJJlmOwQ") {
-//       id,
-//       firstName,
-//       lastName,
-//       age,
-//       address {
-//         city,
-//         country
-//       },
-//       interests {
-//         name
-//       }
-//     }
-// }`
+const recordQuery = `query {
+    users(id: "7WB6kbZSPbrzuJJlmOwQ") {
+      id,
+      firstName,
+      lastName,
+      age,
+      address {
+        city,
+        country
+      },
+      interests {
+        name
+      }
+    }
+}`
 
 // const conditionals = [['age', '==', '30']]
 
@@ -48,7 +49,9 @@ const UsersList = () => {
   // })
 
   const [users, loading] = useFindAll(query)
-  console.log('🚀 ~ file: UsersList.js ~ line 51 ~ UsersList ~ users', users)
+  console.log('🚀 ~ file: UsersList.js( ~ line 51 ~ UsersList ~ users', users)
+  const [user] = useFindRecord(recordQuery)
+  console.log('user from findRecord', user)
 
   // const [document] = useFetchRecord(recordQuery)
   // const [document] = useFindRecord(peekQuery, {

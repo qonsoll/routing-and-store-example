@@ -1,6 +1,11 @@
 import useStore from '../useStore'
+import { useState, useRef, useEffect, useMemo } from 'react'
 import { fetchRecord, construct } from '../methods'
-import { useState, useEffect } from 'react'
+import useUpdateCache from './useUpdateCache'
+import useGetRefreshStatus from './useGetRefreshStatus'
+import pluralize from 'pluralize'
+import { graphQlQueryToJson } from 'graphql-query-to-json'
+import md5 from 'md5'
 
 /**
  * Method helps to fetch record data by query from DB
@@ -9,28 +14,65 @@ import { useState, useEffect } from 'react'
  * @param {string} disable property that disable fetching data
  * @returns [documents, loading, error]
  */
-const useFetchRecord = (query, config, disabled) => {
+const useFetchRecord = (query, config) => {
   // Extracting adapter and models from StoreContext
   const { defaultAdapter, models } = useStore()
+  const [updateCache] = useUpdateCache()
 
-  // Values (state) that should be returned
-  const [error] = useState(null)
+  const queryHash = useMemo(() => query && md5(query), [query])
+  const queryCollection = useMemo(
+    () => query && pluralize(Object.keys(graphQlQueryToJson(query)?.query)[0]),
+    [query]
+  )
+  const getRefreshStatus = useGetRefreshStatus()
+  const document = useRef([])
   const [loading, setLoading] = useState(false)
-  const [document, setDocuments] = useState([])
 
   useEffect(() => {
-    // Method that helps to fetch record data from DB
     const recordFetcher = async () => {
       setLoading(true)
-      const data = await fetchRecord({ query, adapter: defaultAdapter, models })
-      const constructedData = construct(data, query, models)
-      setDocuments(constructedData)
+
+      const dbData = await fetchRecord({
+        query,
+        adapter: defaultAdapter,
+        models
+      })
+      const constructedData = config?.disableConstruct
+        ? dbData
+        : construct(dbData, query, models)
+      !config?.disableCacheUpdate && updateCache(queryHash, dbData)
+      document.current = constructedData?.[queryCollection]
       setLoading(false)
     }
-    if (!disabled) recordFetcher()
-  }, [models, query, defaultAdapter, disabled])
+    let interval
+    if (!config?.disableFetch) {
+      if (config?.forceIntervalRefresh && config?.fetchInterval) {
+        recordFetcher()
+        interval = setInterval(recordFetcher, config?.fetchInterval * 1000)
+      } else {
+        recordFetcher()
+      }
+    }
 
-  return [document, loading, error]
+    return () => {
+      clearInterval(interval)
+    }
+  }, [
+    models,
+    queryCollection,
+    defaultAdapter,
+    queryHash,
+    updateCache,
+    getRefreshStatus,
+    query,
+    config?.disableFetch,
+    config?.disableConstruct,
+    config?.disableCacheUpdate,
+    config?.fetchInterval,
+    config?.forceIntervalRefresh
+  ])
+
+  return [document.current, loading]
 }
 
 export default useFetchRecord
