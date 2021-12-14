@@ -10,44 +10,78 @@ import { fetchAll, construct } from '../methods'
 /**
  * Method helps to fetch all data by query from DB
  * @param {string} query graphql like query
- * @param {object} options options object (fetchInterval: number, forceIntervalRefresh: boolean, construct: boolean)
- * @param {string} disable property that disable fetching data
+ * @param {object} options options object
+ * (fetchInterval: number, forceIntervalRefresh: boolean, construct: boolean, disableConstruct: boolean, disableCacheUpdate: boolean)
  * @returns [documents, loading, error]
  */
 
 const useFetchAll = (query, config) => {
   // Extracting adapter and models from StoreContext
   const { defaultAdapter, models } = useStore()
-  const [updateCache] = useUpdateCache()
 
+  // Extracting method for cache update (runtime storage)
+  const [updateCache, cacheError] = useUpdateCache()
+
+  // Generating queryHash for the saving to the runtime storage
   const queryHash = useMemo(() => query && md5(query), [query])
+
+  // Extracting entry collection name
   const queryCollection = useMemo(
     () => query && pluralize(Object.keys(graphQlQueryToJson(query)?.query)[0]),
     [query]
   )
+
+  // Extracting method for getting refresh status (if refresh is allowed or no)
   const getRefreshStatus = useGetRefreshStatus()
+
+  // Result documents
   const documents = useRef([])
+  const error = useRef(cacheError)
+
+  // Loading state
   const [loading, setLoading] = useState(false)
 
   useEffect(() => {
-    const allFetcher = async () => {
+    const fetchAllHandler = async () => {
+      // Start loading
       setLoading(true)
 
-      const dbData = await fetchAll({ query, adapter: defaultAdapter, models })
-      const constructedData = config?.disableConstruct
-        ? dbData
-        : construct(dbData, query, models)
-      !config?.disableCacheUpdate && updateCache(queryHash, dbData)
-      documents.current = constructedData?.[queryCollection]
-      setLoading(false)
+      try {
+        // Fetch all data from the DB using default adapter
+        const dbData = await fetchAll({
+          query,
+          adapter: defaultAdapter,
+          models
+        })
+
+        // Construct data to the nested objects
+        const constructedData = config?.disableConstruct
+          ? dbData
+          : construct(dbData, query, models)
+
+        // Update cache
+        !config?.disableCacheUpdate && updateCache(queryHash, dbData)
+
+        // Update result documents
+        documents.current = constructedData?.[queryCollection]
+
+        // Finish loading
+        setLoading(false)
+      } catch (err) {
+        // Catch errors
+        console.err(err)
+        error.current = err
+      }
     }
     let interval
     if (!config?.disableFetch) {
       if (config?.forceIntervalRefresh && config?.fetchInterval) {
-        allFetcher()
-        interval = setInterval(allFetcher, config?.fetchInterval * 1000)
+        // Refetch data after interval
+        fetchAllHandler()
+        interval = setInterval(fetchAllHandler, config?.fetchInterval * 1000)
       } else {
-        allFetcher()
+        // Normal fetch
+        fetchAllHandler()
       }
     }
 
@@ -69,7 +103,7 @@ const useFetchAll = (query, config) => {
     config?.forceIntervalRefresh
   ])
 
-  return [documents.current, loading]
+  return [documents.current, loading, error.current]
 }
 
 export default useFetchAll
