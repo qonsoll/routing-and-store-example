@@ -1,7 +1,11 @@
-import useStore from '../useStore'
-import { fetchByQuery, filter, construct } from '../methods'
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useRef, useEffect, useMemo } from 'react'
+import { graphQlQueryToJson } from 'graphql-query-to-json'
+import pluralize from 'pluralize'
 import md5 from 'md5'
+import useStore from '../useStore'
+import useUpdateCache from './useUpdateCache'
+import useGetRefreshStatus from './useGetRefreshStatus'
+import { fetchByQuery, construct } from '../methods'
 
 /**
  * Method helps to find all data by query in db using conditional rules
@@ -10,182 +14,97 @@ import md5 from 'md5'
  * @param {array} conditionals rules for fetching data from db
  * @returns [documents, loading, error]
  */
-const useQuery = (query, options, conditionals) => {
-  const { runtimeStorage, defaultAdapter, models } = useStore()
+const useQuery = (query, config, conditionals) => {
+  // Extracting adapter and models from StoreContext
+  const { defaultAdapter, models } = useStore()
 
-  // Values (state) that should be returned
-  const [documents, setDocuments] = useState([])
+  // Extracting method for cache update (runtime storage)
+  const [updateCache, cacheError] = useUpdateCache()
+
+  // Generating queryHash for the saving to the runtime storage
+  const queryHash = useMemo(() => query && md5(query), [query])
+
+  // Extracting entry collection name
+  const queryCollection = useMemo(
+    () => query && pluralize(Object.keys(graphQlQueryToJson(query)?.query)[0]),
+    [query]
+  )
+
+  // Extracting method for getting refresh status (if refresh is allowed or no)
+  const getRefreshStatus = useGetRefreshStatus()
+
+  // Result documents
+  const documents = useRef([])
+  const error = useRef(cacheError)
+
+  // Loading state
   const [loading, setLoading] = useState(false)
-  const [error, setError] = useState(null)
 
-  // Method that helps to peek cached data if them exist and structure
-  // in different ways (as in DB, or nested object)
-  const peekCachedData = useCallback(async () => {
-    // Using filter algorithm based on runtimeStorage peek method with firestore like conditionals
-    const cachedData = await filter({
-      query,
-      runtimeStorage,
-      models,
-      conditionals
-    }).catch((err) => {
-      console.error(err)
-      setError(err)
-    })
-
-    // Decide how to return data (as in DB or as nested object)
-    const constructedData =
-      options?.construct === undefined || options?.construct === true
-        ? construct(cachedData, query, models)
-        : cachedData
-
-    return constructedData
-  }, [models, query, runtimeStorage, options.construct, conditionals])
-
-  // Method helps to fetch data from the database
-  const fetchDBData = useCallback(async () => {
-    // Using fetchByQuery algorithm, based on adapter query method
-    const dbData = await fetchByQuery({
-      query,
-      adapter: defaultAdapter,
-      models,
-      conditionals,
-      options: {
-        construct: false
-      }
-    }).catch((err) => {
-      console.error(err)
-      setError(err)
-    })
-
-    // Decide how to return data (as in DB or as nested object)
-    const constructedData =
-      options?.construct === undefined || options?.construct === true
-        ? construct(dbData, query, models)
-        : dbData
-
-    return { dbData, constructedData }
-  }, [models, query, defaultAdapter, options.construct, conditionals])
-
-  // Method helps to update current state of runtimeStorage
-  const updateCache = useCallback(
-    async (queryHash, dbData) => {
-      try {
-        // Deep updating of the current state of the storage
-        runtimeStorage.deepUpdate({ structured: dbData })
-        // Updating meta data (when request was made)
-        runtimeStorage.update(
-          `queries.${queryHash}.requestedAt`,
-          new Date().getTime()
-        )
-      } catch (err) {
-        console.error(err)
-        setError(err)
-      }
-    },
-    [runtimeStorage]
-  )
-
-  // Method helps to get info about request time diff
-  const getRefreshStatus = useCallback(
-    (queryHash, fetchInterval) => {
-      if (fetchInterval) {
-        // Get from runtime storage info about last request
-        const lastTimeRequestedAt = runtimeStorage.get(
-          `queries.${queryHash}.requestedAt`
-        )
-        if (lastTimeRequestedAt) {
-          const timeNow = new Date().getTime()
-          const timeDiff = lastTimeRequestedAt && timeNow - lastTimeRequestedAt
-          const fetchIntervalMs = fetchInterval && fetchInterval * 1000
-
-          // Check if refetch allowed
-          const isRefetchAllowed = fetchInterval && timeDiff > fetchIntervalMs
-
-          return isRefetchAllowed
-        } else {
-          return false
-        }
-      } else {
-        return false
-      }
-    },
-    [runtimeStorage]
-  )
-
-  // This method helps to peek or fetch data by query
-  const smartFetch = useCallback(
-    async (params) => {
-      // Generating md5 hash from query
-      const queryHash = md5(query)
-
-      // Check if there are query meta data in runtime storage
-      const isQueryCached = Boolean(runtimeStorage.get(`queries.${queryHash}`))
-
-      // Check if refresh allowed
-      const isRefreshAllowed = getRefreshStatus(
-        queryHash,
-        options.fetchInterval
-      )
-
-      let constructedData = {}
-
-      // Peek or fetch depends on conditions
-      if (isQueryCached && !isRefreshAllowed && options?.disablePeek !== true) {
-        constructedData = await peekCachedData().catch((err) => {
-          console.error(err)
-          setError(err)
-        })
-      } else {
-        // Don't show spinner onRefetch
-        !params?.disableSpinner && setLoading(true)
-
-        const data = await fetchDBData().catch((err) => {
-          console.error(err)
-          setError(err)
-        })
-
-        // Updating cache
-        updateCache(queryHash, data?.dbData)
-        constructedData = data.constructedData
-        !params?.disableSpinner && setLoading(false)
-      }
-
-      // Updating local state
-      setDocuments(constructedData)
-    },
-    [
-      fetchDBData,
-      getRefreshStatus,
-      options.fetchInterval,
-      options.disablePeek,
-      peekCachedData,
-      query,
-      runtimeStorage,
-      updateCache
-    ]
-  )
-
-  // UseEffect helps to fetch data with interval or fetch only once
   useEffect(() => {
-    let interval
-    if (options?.forceIntervalRefresh && options?.fetchInterval) {
-      // Initial fetching
-      smartFetch()
+    const fetchAllHandler = async () => {
+      // Start loading
+      setLoading(true)
 
-      // Interval fetching (will be triggered in fetchInterval seconds)
-      interval = setInterval(() => {
-        smartFetch({ disableSpinner: true })
-      }, options?.fetchInterval * 1000)
-    } else {
-      smartFetch()
+      try {
+        // Fetch all data from the DB using default adapter with conditionals
+        const dbData = await fetchByQuery({
+          query,
+          adapter: defaultAdapter,
+          models,
+          conditionals
+        })
+
+        // Construct data to the nested objects
+        const constructedData = config?.disableConstruct
+          ? dbData
+          : construct(dbData, query, models)
+
+        // Update cache
+        !config?.disableCacheUpdate && updateCache(queryHash, dbData)
+
+        // Update result documents
+        documents.current = constructedData?.[queryCollection]
+
+        // Finish loading
+        setLoading(false)
+      } catch (err) {
+        // Catch errors
+        console.err(err)
+        error.current = err
+      }
+    }
+    let interval
+    if (!config?.disableFetch) {
+      if (config?.forceIntervalRefresh && config?.fetchInterval) {
+        // Refetch data after interval
+        fetchAllHandler()
+        interval = setInterval(fetchAllHandler, config?.fetchInterval * 1000)
+      } else {
+        // Normal fetch
+        fetchAllHandler()
+      }
     }
 
     return () => {
       clearInterval(interval)
     }
-  }, [options.forceIntervalRefresh, options.fetchInterval, smartFetch])
+  }, [
+    models,
+    queryCollection,
+    defaultAdapter,
+    queryHash,
+    updateCache,
+    getRefreshStatus,
+    query,
+    conditionals,
+    config?.disableFetch,
+    config?.disableConstruct,
+    config?.disableCacheUpdate,
+    config?.fetchInterval,
+    config?.forceIntervalRefresh
+  ])
 
-  return [documents, loading, error]
+  return [documents.current, loading, error.current]
 }
 
 export default useQuery

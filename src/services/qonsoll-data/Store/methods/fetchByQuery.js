@@ -1,6 +1,5 @@
 import { graphQlQueryToJson } from 'graphql-query-to-json'
 import { buildCommandsStack, execCommands } from '../helpers'
-import construct from './construct'
 
 /**
  * Method helps to find all data in DB with conditional rules by query
@@ -11,13 +10,7 @@ import construct from './construct'
  * @param {array} conditionals - rules for fetching data from database
  * @returns {object}
  */
-const fetchByQuery = async ({
-  query,
-  adapter,
-  models,
-  options,
-  conditionals
-}) => {
+const fetchByQuery = async ({ query, adapter, models, conditionals }) => {
   // Converting graphql like query to json
   const queryJSON = graphQlQueryToJson(query)
 
@@ -27,10 +20,7 @@ const fetchByQuery = async ({
   // Executing commands one-by-one and making requests to the DB throw adapter
   const data = await execCommands({ commands, adapter, conditionals })
 
-  // Choosing the way how to return data
-  const result = options?.construct ? construct(data, query, models) : data
-
-  return result
+  return data
 }
 
 export default fetchByQuery

@@ -1,22 +1,15 @@
 import { graphQlQueryToJson } from 'graphql-query-to-json'
 import { buildCommandsStack, execCommands } from '../helpers'
-import construct from './construct'
 
 /**
  * Method helps to find all data in DB by query
  * @param {string} query graphql like query
  * @param {object} runtimeStorage runtimeStorage instance
  * @param {object} models models collection to check relationships
- * @param {object} options { construct } - choose the way how to receive response
+ * @param {array} conditionals filter options
  * @returns {object}
  */
-const filter = async ({
-  query,
-  runtimeStorage,
-  models,
-  options,
-  conditionals
-}) => {
+const filter = async ({ query, runtimeStorage, models, conditionals }) => {
   // Converting graphql like query to json
   const queryJSON = graphQlQueryToJson(query)
 
@@ -26,10 +19,7 @@ const filter = async ({
   // Executing commands one-by-one and making requests to the DB throw adapter
   const data = await execCommands({ commands, runtimeStorage, conditionals })
 
-  // Choosing the way how to return data
-  const result = options?.construct ? construct(data, query, models) : data
-
-  return result
+  return data
 }
 
 export default filter

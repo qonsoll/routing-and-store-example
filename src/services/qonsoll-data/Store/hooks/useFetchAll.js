@@ -14,7 +14,6 @@ import { fetchAll, construct } from '../methods'
  * (fetchInterval: number, forceIntervalRefresh: boolean, construct: boolean, disableConstruct: boolean, disableCacheUpdate: boolean)
  * @returns [documents, loading, error]
  */
-
 const useFetchAll = (query, config) => {
   // Extracting adapter and models from StoreContext
   const { defaultAdapter, models } = useStore()

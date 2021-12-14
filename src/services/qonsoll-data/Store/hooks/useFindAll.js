@@ -11,8 +11,13 @@ import useGetRefreshStatus from './useGetRefreshStatus'
  * @returns [documents, loading, error]
  */
 const useFindAll = (query, config) => {
+  // Extracting method for getting refresh status (if refresh is allowed or no)
   const getRefreshStatus = useGetRefreshStatus()
+
+  // Generating queryHash for the saving to the runtime storage
   const queryHash = useMemo(() => query && md5(query), [query])
+
+  // Check that is refresh allowed
   const isRefreshAllowed = useMemo(
     () =>
       config?.fetchInterval
@@ -20,10 +25,16 @@ const useFindAll = (query, config) => {
         : false,
     [queryHash, config?.fetchInterval, getRefreshStatus]
   )
+
+  // Peek all data from cache if needed
   const [cachedDocuments, cacheLoading] = usePeekAll(query, {
     construct: config?.construct,
     disablePeek: config?.disablePeek
   })
+
+  console.log(cachedDocuments)
+
+  // Fetch all data from DB
   const [dbDocuments, loading, error] = useFetchAll(query, {
     disableFetch:
       (!isRefreshAllowed && (cacheLoading || Boolean(cachedDocuments))) ||
@@ -32,7 +43,11 @@ const useFindAll = (query, config) => {
     forceIntervalRefresh: config?.forceIntervalRefresh,
     construct: config?.construct
   })
+
+  // Result documents
   const documents = useRef([])
+
+  // Update result document by data from DB or cache
   documents.current = dbDocuments?.length ? dbDocuments : cachedDocuments
 
   return [documents.current, loading, error]
