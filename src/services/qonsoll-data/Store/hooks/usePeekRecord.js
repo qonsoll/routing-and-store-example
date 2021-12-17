@@ -34,6 +34,7 @@ const usePeekRecord = (query, options) => {
       const constructedData = options?.disableConstruct
         ? cacheData
         : construct(cacheData, query, models)
+
       // Update result documents
       if (constructedData) document.current = constructedData?.[queryCollection]
     }

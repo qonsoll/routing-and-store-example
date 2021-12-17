@@ -1,4 +1,4 @@
-import { useMemo, useRef } from 'react'
+import { useMemo, useState, useEffect } from 'react'
 import md5 from 'md5'
 import usePeekRecord from './usePeekRecord'
 import useFetchRecord from './useFetchRecord'
@@ -11,6 +11,7 @@ import useGetRefreshStatus from './useGetRefreshStatus'
  * @returns [document, loading, error]
  */
 const useFindRecord = (query, config) => {
+  const [document, setDocument] = useState([])
   const getRefreshStatus = useGetRefreshStatus()
   const queryHash = useMemo(() => query && md5(query), [query])
   const isRefreshAllowed = useMemo(
@@ -24,6 +25,7 @@ const useFindRecord = (query, config) => {
     construct: config?.construct,
     disablePeek: config?.disablePeek
   })
+
   const [dbDocument, loading, error] = useFetchRecord(query, {
     disableFetch:
       (!isRefreshAllowed && (cacheLoading || Boolean(cachedDocument))) ||
@@ -32,10 +34,12 @@ const useFindRecord = (query, config) => {
     forceIntervalRefresh: config?.forceIntervalRefresh,
     construct: config?.construct
   })
-  const document = useRef([])
-  document.current = dbDocument?.length ? dbDocument : cachedDocument
 
-  return [document.current, loading, error]
+  useEffect(() => {
+    setDocument(dbDocument?.length ? dbDocument?.[0] : cachedDocument?.[0])
+  }, [cachedDocument, dbDocument, query])
+
+  return [document, loading, error]
 }
 
 export default useFindRecord

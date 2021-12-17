@@ -1,19 +1,33 @@
-import { useEffect } from 'react'
+import { useEffect, useCallback } from 'react'
 import { Container, Row, Col, Title } from '@qonsoll/react-design'
 import { Form } from 'antd'
 import { CitySelect } from 'domains/City/components'
 import { CountrySelect } from 'domains/Country/components'
+import { useStore } from 'services/qonsoll-data/Store'
 
-const AddressSimpleForm = ({ title, address, form }) => {
+const AddressSimpleForm = ({ title, address, form, id }) => {
+  const { runtimeStorage } = useStore()
+
+  const updateCache = useCallback(() => {
+    runtimeStorage.set(
+      `unsaved.addresses.${address?.id || id}`,
+      form.getFieldsValue()
+    )
+    console.log('-----> updateRuntimeStorage', runtimeStorage)
+  }, [address?.id, form, id, runtimeStorage])
+
   useEffect(() => {
+    console.log('address ---->', address)
     address &&
       form.setFieldsValue({
         city: address?.city?.id,
         country: address?.country?.id
       })
-  }, [form, address])
+    address?.id && updateCache()
+  }, [form, address, updateCache])
+
   return (
-    <Form form={form} onFinish={() => {}}>
+    <Form form={form} onFinish={() => {}} onValuesChange={updateCache}>
       <Container mb={4}>
         {title ? (
           <Row mb={3}>

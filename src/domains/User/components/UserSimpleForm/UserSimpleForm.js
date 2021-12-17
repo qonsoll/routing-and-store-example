@@ -1,24 +1,31 @@
-import { useEffect } from 'react'
+import { useEffect, useCallback } from 'react'
 import { Container, Row, Col, Input, Title } from '@qonsoll/react-design'
 import { Form, DatePicker } from 'antd'
-import { useModel } from 'services/qonsoll-data/Store'
+import { useModel, useStore } from 'services/qonsoll-data/Store'
 import moment from 'moment'
 
-const UserSimpleForm = ({ id, title, data, form }) => {
-  const [userModel] = useModel('user')
+const UserSimpleForm = ({ id, title, user, form }) => {
+  const [userModel, getUserId] = useModel('user')
+  const { runtimeStorage } = useStore()
+
+  const updateCache = useCallback(() => {
+    runtimeStorage.set(`unsaved.users.${id}`, form.getFieldsValue())
+    console.log('-----> updateRuntimeStorage', runtimeStorage)
+  }, [form, id, runtimeStorage])
 
   useEffect(() => {
-    data
+    user
       ? form.setFieldsValue({
-          firstName: data?.firstName,
-          lastName: data?.lastName,
-          birthDate: moment(data?.birthDate)
+          firstName: user?.firstName,
+          lastName: user?.lastName,
+          birthDate: moment(user?.birthDate)
         })
       : form.setFieldsValue(userModel?.defaultValues)
-  }, [form, data, userModel?.defaultValues])
+    updateCache()
+  }, [form, updateCache, user, userModel?.defaultValues])
 
   return (
-    <Form form={form} onFinish={() => {}}>
+    <Form form={form} onValuesChange={updateCache} onFinish={() => {}}>
       <Container mb={4}>
         {title ? (
           <Row mb={3}>

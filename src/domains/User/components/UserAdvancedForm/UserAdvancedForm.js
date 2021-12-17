@@ -1,10 +1,17 @@
-// import { useCallback } from 'react'
+import { useCallback } from 'react'
 import { Form } from 'antd'
-// import { Button } from '@qonsoll/react-design'
+import { Button } from '@qonsoll/react-design'
 import UserSimpleForm from '../UserSimpleForm'
 import { AddressSimpleForm } from 'domains/Address/components'
 import { InterestsList } from 'domains/Interest/components'
-import { useFindRecord } from 'services/qonsoll-data/Store'
+import {
+  useFindRecord,
+  useMutations,
+  useModel,
+  useStore
+} from 'services/qonsoll-data/Store'
+import moment from 'moment'
+import _ from 'lodash'
 
 const UserAdvancedForm = ({ id }) => {
   const query = `query {
@@ -29,16 +36,78 @@ const UserAdvancedForm = ({ id }) => {
       }
     }
 }`
+
   const [user, loading] = useFindRecord(query)
+  const [userModel, getUserId] = useModel('user')
+  const [addressModel, getAddressId] = useModel('address')
+
+  const currentUserId = id || getUserId()
+  const currentAddressId = user?.address?.id || getAddressId()
 
   const [userForm] = Form.useForm()
   const [addressForm] = Form.useForm()
 
-  // const submit = useCallback(() => {
-  //   const user = userForm.getFieldsValue()
-  //   const address = addressForm.getFieldsValue()
-  //   console.log('form data ->', user, address)
-  // }, [userForm, addressForm])
+  const { add, update } = useMutations()
+  const { runtimeStorage } = useStore()
+
+  const createRecord = useCallback(() => {
+    let userData = runtimeStorage.get(`unsaved.users.${currentUserId}`)
+    userData.address = currentAddressId
+    userData.birthDate = moment(userData.birthDate).format('YYYY-MM-DD') || null
+
+    userData = _.merge(userModel.defaultValues, userData)
+
+    let addressData = runtimeStorage.get(
+      `unsaved.addresses.${currentAddressId}`
+    )
+    const interestsData = runtimeStorage.get(`unsaved.interests`)
+    console.log(interestsData)
+
+    userData && addressData && add('user', currentUserId, userData)
+    userData && addressData && add('address', currentAddressId, addressData)
+    interestsData &&
+      Object.entries(interestsData).forEach(
+        (interest) => interest && add('interest', interest?.id, interest)
+      )
+
+    console.log(runtimeStorage)
+  }, [
+    add,
+    currentAddressId,
+    currentUserId,
+    runtimeStorage,
+    userModel?.defaultValues
+  ])
+
+  const updateRecord = useCallback(() => {
+    const userData = runtimeStorage.get(`unsaved.users.${currentUserId}`)
+    userData.address = currentAddressId
+    const addressData = runtimeStorage.get(
+      `unsaved.addresses.${currentAddressId}`
+    )
+    userData.birthDate = moment(userData.birthDate).format('YYYY-MM-DD')
+
+    const interestsData = runtimeStorage.get(`unsaved.interests`)
+    console.log('interestsData --->', interestsData)
+
+    interestsData &&
+      Object.entries(interestsData).forEach((interestItem) => {
+        const [id, interest] = interestItem
+        interest && add('interest', id, interest)
+      })
+
+    userData && update('user', currentUserId, userData)
+    addressData && update('address', currentAddressId, addressData)
+    console.log(runtimeStorage)
+  }, [add, currentAddressId, currentUserId, runtimeStorage, update])
+
+  const submitSave = useCallback(() => {
+    const action = id ? updateRecord : createRecord
+    action()
+    runtimeStorage.remove('unsaved')
+
+    console.log(runtimeStorage)
+  }, [createRecord, id, runtimeStorage, updateRecord])
 
   return (
     <>
@@ -50,15 +119,20 @@ const UserAdvancedForm = ({ id }) => {
             title="General info"
             form={userForm}
             user={user}
-            id={id}
+            id={currentUserId}
           />
           <AddressSimpleForm
             title="Address"
             form={addressForm}
             address={user?.address}
+            id={currentAddressId}
           />
-          <InterestsList title="Interests" interests={user?.interests} />
-          {/* <Button onClick={submit}>Save</Button> */}
+          <InterestsList
+            userId={currentUserId}
+            title="Interests"
+            interests={user?.interests}
+          />
+          <Button onClick={submitSave}>Save</Button>
         </>
       )}
     </>

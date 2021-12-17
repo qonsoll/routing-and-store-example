@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState, useCallback } from 'react'
 import {
   Container,
   Row,
@@ -9,13 +9,29 @@ import {
 } from '@qonsoll/react-design'
 import InterestSimpleView from '../InterestSimpleView'
 import InterestSimpleForm from '../InterestSimpleForm'
+import { useStore } from 'services/qonsoll-data/Store'
 
-const InterestsList = ({ title, interests }) => {
+const InterestsList = ({ title, interests, userId }) => {
+  const { runtimeStorage } = useStore()
+  const [isInitialized, setIsInitialized] = useState(true)
+
   const [state, setState] = useState([])
 
+  const updateCache = useCallback(() => {
+    interests?.forEach((interest) => {
+      runtimeStorage.push(`unsaved.users.${userId}.interests`, interest.id)
+      runtimeStorage.set(`unsaved.interests.${interest.id}`, interest)
+    })
+  }, [interests, runtimeStorage, userId])
+
   useEffect(() => {
-    interests && setState(interests)
-  }, [interests])
+    console.log('useEffect update state', state)
+    if (interests && isInitialized) {
+      setState(interests)
+      setIsInitialized(false)
+    }
+    updateCache()
+  }, [updateCache, interests, runtimeStorage, userId, isInitialized, state])
 
   return (
     <Container>
@@ -27,7 +43,13 @@ const InterestsList = ({ title, interests }) => {
           <Col cw="auto">
             <Dropdown
               onVisibleChange={function noRefCheck() {}}
-              overlay={<InterestSimpleForm />}
+              overlay={
+                <InterestSimpleForm
+                  state={state}
+                  setState={setState}
+                  userId={userId}
+                />
+              }
             >
               <Button type="primary" size="small">
                 Add interest
@@ -36,14 +58,15 @@ const InterestsList = ({ title, interests }) => {
           </Col>
         </Row>
       ) : null}
-      {!interests?.length ? (
+      {!state?.length ? (
         <Row>
           <Col>No interests</Col>
         </Row>
       ) : null}
-      {state?.map((interest) => (
-        <InterestSimpleView key={interest?.id} interest={interest} />
-      ))}
+      {state?.map((interest) => {
+        console.log('interest ID ---->', interest?.id)
+        return <InterestSimpleView key={interest?.id} interest={interest} />
+      })}
     </Container>
   )
 }

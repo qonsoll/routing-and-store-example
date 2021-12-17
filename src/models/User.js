@@ -4,9 +4,10 @@ import * as yup from 'yup'
 const validationSchema = yup.object().shape({
   firstName: yup.string().required().default('Alex'),
   lastName: yup.string().required().default('Pas'),
-  birthDate: yup.date(),
+  age: yup.number().notRequired().nullable().default(null),
+  birthDate: yup.date().notRequired().nullable().default(null),
   address: yup.string().required(),
-  interests: yup.array()
+  interests: yup.array().notRequired().nullable().default(null)
 })
 
 const User = model(

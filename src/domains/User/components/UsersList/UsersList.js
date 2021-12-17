@@ -22,21 +22,21 @@ const query = `query {
     }
 }`
 
-// const recordQuery = `query {
-//     users(id: "7WB6kbZSPbrzuJJlmOwQ") {
-//       id,
-//       firstName,
-//       lastName,
-//       age,
-//       address {
-//         city,
-//         country
-//       },
-//       interests {
-//         name
-//       }
-//     }
-// }`
+const recordQuery = `query {
+    users(id: "7WB6kbZSPbrzuJJlmOwQ") {
+      id,
+      firstName,
+      lastName,
+      age,
+      address {
+        city,
+        country
+      },
+      interests {
+        name
+      }
+    }
+}`
 
 // const conditionals = [['age', '==', '30']]
 
@@ -48,6 +48,7 @@ const UsersList = () => {
   // })
 
   const [users, loading] = useFindAll(query)
+  console.log(users)
   // console.log('🚀 ~ file: UsersList.js( ~ line 51 ~ UsersList ~ users', users)
   // const [user] = useFindRecord(recordQuery)
   // console.log('user from findRecord', user)
