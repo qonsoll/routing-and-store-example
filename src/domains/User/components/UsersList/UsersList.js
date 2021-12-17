@@ -22,21 +22,21 @@ const query = `query {
     }
 }`
 
-const recordQuery = `query {
-    users(id: "7WB6kbZSPbrzuJJlmOwQ") {
-      id,
-      firstName,
-      lastName,
-      age,
-      address {
-        city,
-        country
-      },
-      interests {
-        name
-      }
-    }
-}`
+// const recordQuery = `query {
+//     users(id: "7WB6kbZSPbrzuJJlmOwQ") {
+//       id,
+//       firstName,
+//       lastName,
+//       age,
+//       address {
+//         city,
+//         country
+//       },
+//       interests {
+//         name
+//       }
+//     }
+// }`
 
 // const conditionals = [['age', '==', '30']]
 

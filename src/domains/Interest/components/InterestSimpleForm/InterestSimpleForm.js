@@ -7,7 +7,7 @@ const InterestSimpleForm = ({ userId, state, setState }) => {
   const { runtimeStorage } = useStore()
   const [interestModel, getInterestId] = useModel('interest')
 
-  const { control, handleSubmit } = useForm({
+  const { control, handleSubmit, reset } = useForm({
     defaultValues: {
       name: ''
     }
@@ -16,6 +16,7 @@ const InterestSimpleForm = ({ userId, state, setState }) => {
   const onSubmit = useCallback(
     (data) => {
       const interestId = getInterestId()
+
       runtimeStorage.push(`unsaved.users.${userId}.interests`, interestId)
       runtimeStorage.set(`unsaved.interests.${interestId}`, {
         id: interestId,
@@ -26,6 +27,7 @@ const InterestSimpleForm = ({ userId, state, setState }) => {
       newInterests.push(runtimeStorage.get(`unsaved.interests.${interestId}`))
       setState(newInterests)
 
+      reset()
       console.log(runtimeStorage)
     },
     [getInterestId, runtimeStorage, setState, state, userId]
@@ -35,6 +37,7 @@ const InterestSimpleForm = ({ userId, state, setState }) => {
     (e) => {
       if (e.key === 'Enter') {
         handleSubmit(onSubmit)
+        e.target.value = ''
       }
     },
     [handleSubmit, onSubmit]

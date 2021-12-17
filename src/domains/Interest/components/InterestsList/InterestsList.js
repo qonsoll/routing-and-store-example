@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, useCallback } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import {
   Container,
   Row,
@@ -25,7 +25,6 @@ const InterestsList = ({ title, interests, userId }) => {
   }, [interests, runtimeStorage, userId])
 
   useEffect(() => {
-    console.log('useEffect update state', state)
     if (interests && isInitialized) {
       setState(interests)
       setIsInitialized(false)

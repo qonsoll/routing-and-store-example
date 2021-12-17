@@ -5,7 +5,7 @@ import { useModel, useStore } from 'services/qonsoll-data/Store'
 import moment from 'moment'
 
 const UserSimpleForm = ({ id, title, user, form }) => {
-  const [userModel, getUserId] = useModel('user')
+  const [userModel] = useModel('user')
   const { runtimeStorage } = useStore()
 
   const updateCache = useCallback(() => {
