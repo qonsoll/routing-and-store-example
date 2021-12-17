@@ -29,7 +29,6 @@ const notEqual = (object, field, value) => {
 }
 
 const filterCollection = (state, collectionPath, params) => {
-  console.log(state)
   const filteredItems = []
 
   const logicOperands = {
@@ -62,7 +61,6 @@ const useFilterRecords = (state, dispatch) => {
     const filteredElements = filterCollection(state, collectionPath, [
       ...params
     ])
-    console.log(filteredElements)
   }
   return filterRecords
 }

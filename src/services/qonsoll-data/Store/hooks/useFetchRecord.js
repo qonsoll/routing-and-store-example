@@ -72,7 +72,7 @@ const useFetchRecord = (query, config) => {
       }
     }
     let interval
-    if (config?.disableFetch) {
+    if (!config?.disableFetch) {
       if (config?.forceIntervalRefresh && config?.fetchInterval) {
         console.log(config?.forceIntervalRefresh && config?.fetchInterval)
         // Refetch data after interval

@@ -1,4 +1,4 @@
-import { useMemo, useState, useEffect } from 'react'
+import { useMemo, useRef } from 'react'
 import md5 from 'md5'
 import usePeekRecord from './usePeekRecord'
 import useFetchRecord from './useFetchRecord'
@@ -11,9 +11,14 @@ import useGetRefreshStatus from './useGetRefreshStatus'
  * @returns [document, loading, error]
  */
 const useFindRecord = (query, config) => {
-  const [document, setDocument] = useState([])
+  // Extracting method for getting refresh status (if refresh is allowed or no)
   const getRefreshStatus = useGetRefreshStatus()
+  console.log('getRefreshStatus', getRefreshStatus())
+
+  // Generating queryHash for the saving to the runtime storage
   const queryHash = useMemo(() => query && md5(query), [query])
+
+  // Check that is refresh allowed
   const isRefreshAllowed = useMemo(
     () =>
       config?.fetchInterval
@@ -21,25 +26,36 @@ const useFindRecord = (query, config) => {
         : false,
     [queryHash, config?.fetchInterval, getRefreshStatus]
   )
-  const [cachedDocument, cacheLoading] = usePeekRecord(query, {
+
+  // Peek record data from cache if needed
+  const [cachedDocuments, cacheLoading] = usePeekRecord(query, {
     construct: config?.construct,
     disablePeek: config?.disablePeek
   })
 
-  const [dbDocument, loading, error] = useFetchRecord(query, {
+  // Fetch record data from DB
+  console.log(
+    'needFetch ???',
+    !isRefreshAllowed && (cacheLoading || Boolean(cachedDocuments))
+  )
+  const [dbDocuments, loading, error] = useFetchRecord(query, {
     disableFetch:
-      (!isRefreshAllowed && (cacheLoading || Boolean(cachedDocument))) ||
+      (!isRefreshAllowed && (cacheLoading || Boolean(cachedDocuments))) ||
       config?.disableFetch,
     fetchInterval: config?.fetchInterval,
     forceIntervalRefresh: config?.forceIntervalRefresh,
     construct: config?.construct
   })
 
-  useEffect(() => {
-    setDocument(dbDocument?.length ? dbDocument?.[0] : cachedDocument?.[0])
-  }, [cachedDocument, dbDocument, query])
+  // Result documents
+  const documents = useRef([])
 
-  return [document, loading, error]
+  // Update result document by data from DB or cache
+  documents.current = dbDocuments?.length
+    ? dbDocuments?.[0]
+    : cachedDocuments?.[0]
+
+  return [documents.current, loading, error]
 }
 
 export default useFindRecord

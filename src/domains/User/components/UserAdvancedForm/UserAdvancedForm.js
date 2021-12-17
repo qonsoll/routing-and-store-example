@@ -4,16 +4,16 @@ import { Button } from '@qonsoll/react-design'
 import UserSimpleForm from '../UserSimpleForm'
 import { AddressSimpleForm } from 'domains/Address/components'
 import { InterestsList } from 'domains/Interest/components'
-import {
-  useFindRecord,
-  useMutations,
-  useModel,
-  useStore
-} from 'services/qonsoll-data/Store'
-import moment from 'moment'
-import _ from 'lodash'
+import { useFindRecord, useModel, useStore } from 'services/qonsoll-data/Store'
+import { useHistory } from 'react-router-dom'
+import { useCreateRecord, useUpdateRecord } from './hooks'
 
 const UserAdvancedForm = ({ id }) => {
+  const history = useHistory()
+
+  const createRecord = useCreateRecord()
+  const updateRecord = useUpdateRecord()
+
   const query = `query {
     users(id: "${id}") {
       firstName,
@@ -38,8 +38,8 @@ const UserAdvancedForm = ({ id }) => {
 }`
 
   const [user, loading] = useFindRecord(query)
-  const [userModel, getUserId] = useModel('user')
-  const [addressModel, getAddressId] = useModel('address')
+  const [, getUserId] = useModel('user')
+  const [, getAddressId] = useModel('address')
 
   const currentUserId = id || getUserId()
   const currentAddressId = user?.address?.id || getAddressId()
@@ -47,67 +47,26 @@ const UserAdvancedForm = ({ id }) => {
   const [userForm] = Form.useForm()
   const [addressForm] = Form.useForm()
 
-  const { add, update } = useMutations()
   const { runtimeStorage } = useStore()
 
-  const createRecord = useCallback(() => {
-    let userData = runtimeStorage.get(`unsaved.users.${currentUserId}`)
-    userData.address = currentAddressId
-    userData.birthDate = moment(userData.birthDate).format('YYYY-MM-DD') || null
-
-    userData = _.merge(userModel.defaultValues, userData)
-
-    let addressData = runtimeStorage.get(
-      `unsaved.addresses.${currentAddressId}`
-    )
-    const interestsData = runtimeStorage.get(`unsaved.interests`)
-    console.log(interestsData)
-
-    userData && addressData && add('user', currentUserId, userData)
-    userData && addressData && add('address', currentAddressId, addressData)
-    interestsData &&
-      Object.entries(interestsData).forEach(
-        (interest) => interest && add('interest', interest?.id, interest)
-      )
+  const submitSave = useCallback(() => {
+    const action = id
+      ? () => updateRecord(currentUserId, currentAddressId)
+      : () => createRecord(currentUserId, currentAddressId)
+    action()
+    runtimeStorage.remove('unsaved')
+    history.push('/users')
 
     console.log(runtimeStorage)
   }, [
-    add,
+    createRecord,
     currentAddressId,
     currentUserId,
+    history,
+    id,
     runtimeStorage,
-    userModel?.defaultValues
+    updateRecord
   ])
-
-  const updateRecord = useCallback(() => {
-    const userData = runtimeStorage.get(`unsaved.users.${currentUserId}`)
-    userData.address = currentAddressId
-    const addressData = runtimeStorage.get(
-      `unsaved.addresses.${currentAddressId}`
-    )
-    userData.birthDate = moment(userData.birthDate).format('YYYY-MM-DD')
-
-    const interestsData = runtimeStorage.get(`unsaved.interests`)
-    console.log('interestsData --->', interestsData)
-
-    interestsData &&
-      Object.entries(interestsData).forEach((interestItem) => {
-        const [id, interest] = interestItem
-        interest && add('interest', id, interest)
-      })
-
-    userData && update('user', currentUserId, userData)
-    addressData && update('address', currentAddressId, addressData)
-    console.log(runtimeStorage)
-  }, [add, currentAddressId, currentUserId, runtimeStorage, update])
-
-  const submitSave = useCallback(() => {
-    const action = id ? updateRecord : createRecord
-    action()
-    runtimeStorage.remove('unsaved')
-
-    console.log(runtimeStorage)
-  }, [createRecord, id, runtimeStorage, updateRecord])
 
   return (
     <>

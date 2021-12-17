@@ -18,6 +18,7 @@ const InterestsList = ({ title, interests, userId }) => {
   const [state, setState] = useState([])
 
   const updateCache = useCallback(() => {
+    runtimeStorage.set(`unsaved.users.${userId}.interests`, [])
     interests?.forEach((interest) => {
       runtimeStorage.push(`unsaved.users.${userId}.interests`, interest.id)
       runtimeStorage.set(`unsaved.interests.${interest.id}`, interest)
@@ -28,8 +29,8 @@ const InterestsList = ({ title, interests, userId }) => {
     if (interests && isInitialized) {
       setState(interests)
       setIsInitialized(false)
+      updateCache()
     }
-    updateCache()
   }, [updateCache, interests, runtimeStorage, userId, isInitialized, state])
 
   return (

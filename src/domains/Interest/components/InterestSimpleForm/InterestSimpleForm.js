@@ -5,7 +5,7 @@ import { useModel, useStore } from 'services/qonsoll-data/Store'
 
 const InterestSimpleForm = ({ userId, state, setState }) => {
   const { runtimeStorage } = useStore()
-  const [interestModel, getInterestId] = useModel('interest')
+  const [, getInterestId] = useModel('interest')
 
   const { control, handleSubmit, reset } = useForm({
     defaultValues: {
@@ -30,7 +30,7 @@ const InterestSimpleForm = ({ userId, state, setState }) => {
       reset()
       console.log(runtimeStorage)
     },
-    [getInterestId, runtimeStorage, setState, state, userId]
+    [getInterestId, reset, runtimeStorage, setState, state, userId]
   )
 
   const onEnterPress = useCallback(

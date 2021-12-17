@@ -13,11 +13,9 @@ const AddressSimpleForm = ({ title, address, form, id }) => {
       `unsaved.addresses.${address?.id || id}`,
       form.getFieldsValue()
     )
-    console.log('-----> updateRuntimeStorage', runtimeStorage)
   }, [address?.id, form, id, runtimeStorage])
 
   useEffect(() => {
-    console.log('address ---->', address)
     address &&
       form.setFieldsValue({
         city: address?.city?.id,

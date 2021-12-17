@@ -17,7 +17,12 @@ const usePeekRecord = (query, options) => {
 
   // Result document
   const document = useRef([])
+
+  // Error state
   const [error] = useState(null)
+
+  //Loading state
+  const [loading, setLoading] = useState(true)
 
   // Extracting entry collection name
   const queryCollection = useMemo(
@@ -37,6 +42,8 @@ const usePeekRecord = (query, options) => {
 
       // Update result documents
       if (constructedData) document.current = constructedData?.[queryCollection]
+
+      setLoading(false)
     }
     if (!options?.disablePeek && query) recordPeeker()
   }, [
@@ -48,7 +55,7 @@ const usePeekRecord = (query, options) => {
     options?.disableConstruct
   ])
 
-  return [document.current, error]
+  return [document.current, loading, error]
 }
 
 export default usePeekRecord
