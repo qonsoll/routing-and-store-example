@@ -17,7 +17,7 @@ const useModel = (modelName) => {
     [models]
   )
 
-  const getId = () => defaultAdapter.generateId(modelName)
+  const getId = () => modelName && defaultAdapter.generateId(modelName)
 
   useEffect(() => {
     const modelData = modelName && getModelData(modelName)

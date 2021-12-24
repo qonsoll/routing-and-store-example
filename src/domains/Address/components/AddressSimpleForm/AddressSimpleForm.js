@@ -1,31 +1,32 @@
-import { useEffect, useCallback } from 'react'
+import { useEffect } from 'react'
 import { Container, Row, Col, Title } from '@qonsoll/react-design'
 import { Form } from 'antd'
 import { CitySelect } from 'domains/City/components'
 import { CountrySelect } from 'domains/Country/components'
-import { useStore } from 'services/qonsoll-data/Store'
+import { useQForm } from '../../../User/components/UserAdvancedForm/hooks'
 
-const AddressSimpleForm = ({ title, address, form, id }) => {
-  const { runtimeStorage } = useStore()
-
-  const updateCache = useCallback(() => {
-    runtimeStorage.set(
-      `unsaved.addresses.${address?.id || id}`,
-      form.getFieldsValue()
-    )
-  }, [address?.id, form, id, runtimeStorage])
+const AddressSimpleForm = ({ title, address, form, id, userId }) => {
+  const { initializeForm, updateCache, updateRelationshipCache } = useQForm({
+    parentId: userId,
+    id,
+    modelName: 'address',
+    document: address,
+    form
+  })
 
   useEffect(() => {
-    address &&
-      form.setFieldsValue({
-        city: address?.city?.id,
-        country: address?.country?.id
-      })
-    address?.id && updateCache()
-  }, [form, address, updateCache])
+    initializeForm()
+  }, [form, address, updateCache, initializeForm])
 
   return (
-    <Form form={form} onFinish={() => {}} onValuesChange={updateCache}>
+    <Form
+      form={form}
+      onFinish={() => {}}
+      onValuesChange={() => {
+        updateCache()
+        updateRelationshipCache('user', userId)
+      }}
+    >
       <Container mb={4}>
         {title ? (
           <Row mb={3}>

@@ -1,38 +1,60 @@
 import { useCallback } from 'react'
-import { useStore, useMutations, useModel } from 'services/qonsoll-data/Store'
+import { useStore, useMutations } from 'services/qonsoll-data/Store'
 import moment from 'moment'
-import _ from 'lodash'
+import pluralize from 'pluralize'
 
-const useCreateRecord = () => {
+/**
+ * Hook return method that helps to create new record
+ * @param {object} updatedDocument object that has document id and modelName
+ * @param {array} relationshipModels array of the relationship model names
+ */
+const useCreateRecord = (updatedDocument, relationshipModels) => {
+  // Getting a runtime storage for working with cache
   const { runtimeStorage } = useStore()
+  // Getting a add mutation for creating a new document
   const { add } = useMutations()
-  const [userModel] = useModel('user')
 
-  const createRecord = useCallback(
-    (currentUserId, currentAddressId) => {
-      let userData = runtimeStorage.get(`unsaved.users.${currentUserId}`)
-      userData.address = currentAddressId
-      userData.birthDate =
-        moment(userData.birthDate).format('YYYY-MM-DD') || null
+  const createRecord = useCallback(() => {
+    // Destructuring id and model name from creating document
+    const { id, modelName } = updatedDocument
+    console.log(updatedDocument)
+    // Pluralize model name
+    const normalizedModelName = modelName && pluralize(modelName)
 
-      userData = _.merge(userModel.defaultValues, userData)
+    // Query for runtime storage that getting new document data
+    const documentQuery = `unsaved.${normalizedModelName}.${id}`
 
-      let addressData = runtimeStorage.get(
-        `unsaved.addresses.${currentAddressId}`
+    // Getting a document data from cache by query
+    const documentData = id && modelName && runtimeStorage.get(documentQuery)
+    const resultData = documentData || {}
+
+    // If field type is moment format it to string
+    const resultKeys = resultData && Object.keys(resultData)
+    resultKeys?.forEach((key) => {
+      if (moment.isMoment(resultData[key]))
+        resultData[key] = moment(resultData[key]).format('YYYY-MM-DD')
+    })
+
+    //Creating parent document if data exist
+    resultData && add(normalizedModelName, id, resultData)
+
+    // Create document for every relationship model
+    relationshipModels?.forEach((relationshipModel) => {
+      // Getting all model ids
+      const relationshipIds = Object.keys(
+        runtimeStorage.get(`unsaved.${pluralize(relationshipModel)}`) || {}
       )
-      const interestsData = runtimeStorage.get(`unsaved.interests`)
-
-      userData && addressData && add('user', currentUserId, userData)
-      userData && addressData && add('address', currentAddressId, addressData)
-      interestsData &&
-        Object.entries(interestsData).forEach(
-          (interest) => interest && add('interest', interest?.id, interest)
+      relationshipIds?.forEach((relationshipId) => {
+        // For every id getting data
+        const relationshipData = runtimeStorage.get(
+          `unsaved.${pluralize(relationshipModel)}.${relationshipId}`
         )
-
-      console.log(runtimeStorage)
-    },
-    [add, runtimeStorage, userModel?.defaultValues]
-  )
+        // If data exist create new document
+        relationshipId &&
+          add(pluralize(relationshipModel), relationshipId, relationshipData)
+      })
+    })
+  }, [add, relationshipModels, runtimeStorage, updatedDocument])
 
   return createRecord
 }

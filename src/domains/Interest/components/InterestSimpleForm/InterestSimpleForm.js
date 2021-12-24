@@ -1,68 +1,36 @@
 import { Container, Row, Col, Input } from '@qonsoll/react-design'
-import { useForm, Controller } from 'react-hook-form'
 import { useCallback } from 'react'
-import { useModel, useStore } from 'services/qonsoll-data/Store'
+import { useModel } from 'services/qonsoll-data/Store'
+import { Form } from 'antd'
 
-const InterestSimpleForm = ({ userId, state, setState }) => {
-  const { runtimeStorage } = useStore()
+const InterestSimpleForm = ({ state, setState, form }) => {
   const [, getInterestId] = useModel('interest')
-
-  const { control, handleSubmit, reset } = useForm({
-    defaultValues: {
-      name: ''
-    }
-  })
-
-  const onSubmit = useCallback(
-    (data) => {
-      const interestId = getInterestId()
-
-      runtimeStorage.push(`unsaved.users.${userId}.interests`, interestId)
-      runtimeStorage.set(`unsaved.interests.${interestId}`, {
-        id: interestId,
-        ...data
-      })
-
-      const newInterests = [...state]
-      newInterests.push(runtimeStorage.get(`unsaved.interests.${interestId}`))
-      setState(newInterests)
-
-      reset()
-      console.log(runtimeStorage)
-    },
-    [getInterestId, reset, runtimeStorage, setState, state, userId]
-  )
+  const interestId = getInterestId()
 
   const onEnterPress = useCallback(
     (e) => {
       if (e.key === 'Enter') {
-        handleSubmit(onSubmit)
-        e.target.value = ''
+        const newInterests = [...state]
+        newInterests.push({ id: interestId, name: e.target.value })
+        setState([...newInterests])
+        form.resetFields()
       }
     },
-    [handleSubmit, onSubmit]
+    [form, interestId, setState, state]
   )
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
+    <Form form={form}>
       <Container>
         <Row mb={3}>
           <Col>
-            <Controller
-              name="name"
-              control={control}
-              render={({ field }) => (
-                <Input
-                  {...field}
-                  onKeyDown={onEnterPress}
-                  placeholder="Enter interest"
-                />
-              )}
-            />
+            <Form.Item name="name">
+              <Input onKeyDown={onEnterPress} placeholder="Enter interest" />
+            </Form.Item>
           </Col>
         </Row>
       </Container>
-    </form>
+    </Form>
   )
 }
 

@@ -47,7 +47,9 @@ const UsersList = () => {
   // construct: true
   // })
 
-  const [users, loading] = useFindAll(query)
+  const [users, loading] = useFindAll(query, {
+    fetchInterval: 10
+  })
   console.log(users)
   // console.log('🚀 ~ file: UsersList.js( ~ line 51 ~ UsersList ~ users', users)
   // const [user] = useFindRecord(recordQuery)

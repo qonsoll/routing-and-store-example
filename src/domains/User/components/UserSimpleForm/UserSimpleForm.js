@@ -1,28 +1,21 @@
-import { useEffect, useCallback } from 'react'
+import { useEffect } from 'react'
 import { Container, Row, Col, Input, Title } from '@qonsoll/react-design'
 import { Form, DatePicker } from 'antd'
-import { useModel, useStore } from 'services/qonsoll-data/Store'
-import moment from 'moment'
+import { useModel } from 'services/qonsoll-data/Store'
+import { useQForm } from '../UserAdvancedForm/hooks'
 
 const UserSimpleForm = ({ id, title, user, form }) => {
   const [userModel] = useModel('user')
-  const { runtimeStorage } = useStore()
-
-  const updateCache = useCallback(() => {
-    runtimeStorage.set(`unsaved.users.${id}`, form.getFieldsValue())
-    console.log('-----> updateRuntimeStorage', runtimeStorage)
-  }, [form, id, runtimeStorage])
+  const { initializeForm, updateCache } = useQForm({
+    form,
+    modelName: 'user',
+    document: user,
+    id
+  })
 
   useEffect(() => {
-    user
-      ? form.setFieldsValue({
-          firstName: user?.firstName,
-          lastName: user?.lastName,
-          birthDate: moment(user?.birthDate)
-        })
-      : form.setFieldsValue(userModel?.defaultValues)
-    updateCache()
-  }, [form, updateCache, user, userModel?.defaultValues])
+    initializeForm()
+  }, [form, initializeForm, updateCache, user, userModel?.defaultValues])
 
   return (
     <Form form={form} onValuesChange={updateCache} onFinish={() => {}}>

@@ -4,15 +4,12 @@ import { Button } from '@qonsoll/react-design'
 import UserSimpleForm from '../UserSimpleForm'
 import { AddressSimpleForm } from 'domains/Address/components'
 import { InterestsList } from 'domains/Interest/components'
-import { useFindRecord, useModel, useStore } from 'services/qonsoll-data/Store'
+import { useFindRecord, useModel } from 'services/qonsoll-data/Store'
 import { useHistory } from 'react-router-dom'
-import { useCreateRecord, useUpdateRecord } from './hooks'
+import { useQForm } from './hooks'
 
 const UserAdvancedForm = ({ id }) => {
   const history = useHistory()
-
-  const createRecord = useCreateRecord()
-  const updateRecord = useUpdateRecord()
 
   const query = `query {
     users(id: "${id}") {
@@ -38,35 +35,30 @@ const UserAdvancedForm = ({ id }) => {
 }`
 
   const [user, loading] = useFindRecord(query)
-  const [, getUserId] = useModel('user')
   const [, getAddressId] = useModel('address')
+  const [, getUserId] = useModel('user')
 
-  const currentUserId = id || getUserId()
   const currentAddressId = user?.address?.id || getAddressId()
+  const currentUserId = id || getUserId()
 
   const [userForm] = Form.useForm()
   const [addressForm] = Form.useForm()
+  const [interestForm] = Form.useForm()
 
-  const { runtimeStorage } = useStore()
+  console.log('currentUserId', currentUserId)
+
+  const { submit } = useQForm({
+    parentId: currentUserId,
+    id: currentUserId,
+    actionType: id ? 'update' : 'create',
+    modelName: 'user',
+    relationshipModels: ['address', 'interest']
+  })
 
   const submitSave = useCallback(() => {
-    const action = id
-      ? () => updateRecord(currentUserId, currentAddressId)
-      : () => createRecord(currentUserId, currentAddressId)
-    action()
-    runtimeStorage.remove('unsaved')
+    submit()
     history.push('/users')
-
-    console.log(runtimeStorage)
-  }, [
-    createRecord,
-    currentAddressId,
-    currentUserId,
-    history,
-    id,
-    runtimeStorage,
-    updateRecord
-  ])
+  }, [history, submit])
 
   return (
     <>
@@ -84,12 +76,14 @@ const UserAdvancedForm = ({ id }) => {
             title="Address"
             form={addressForm}
             address={user?.address}
+            userId={currentUserId}
             id={currentAddressId}
           />
           <InterestsList
             userId={currentUserId}
             title="Interests"
             interests={user?.interests}
+            form={interestForm}
           />
           <Button onClick={submitSave}>Save</Button>
         </>

@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState } from 'react'
 import {
   Container,
   Row,
@@ -10,28 +10,39 @@ import {
 import InterestSimpleView from '../InterestSimpleView'
 import InterestSimpleForm from '../InterestSimpleForm'
 import { useStore } from 'services/qonsoll-data/Store'
+import { useQForm } from '../../../User/components/UserAdvancedForm/hooks'
 
-const InterestsList = ({ title, interests, userId }) => {
+const InterestsList = ({ title, interests, userId, form }) => {
   const { runtimeStorage } = useStore()
   const [isInitialized, setIsInitialized] = useState(true)
+  console.log('parrent id in interest list', userId)
 
   const [state, setState] = useState([])
 
-  const updateCache = useCallback(() => {
-    runtimeStorage.set(`unsaved.users.${userId}.interests`, [])
-    interests?.forEach((interest) => {
-      runtimeStorage.push(`unsaved.users.${userId}.interests`, interest.id)
-      runtimeStorage.set(`unsaved.interests.${interest.id}`, interest)
-    })
-  }, [interests, runtimeStorage, userId])
+  const { updateCache, updateRelationshipCache } = useQForm({
+    parentId: userId,
+    modelName: 'interests',
+    document: state
+  })
 
   useEffect(() => {
     if (interests && isInitialized) {
       setState(interests)
       setIsInitialized(false)
-      updateCache()
     }
-  }, [updateCache, interests, runtimeStorage, userId, isInitialized, state])
+    if (state.length !== 0) {
+      updateCache()
+      updateRelationshipCache('user', userId)
+    }
+  }, [
+    updateCache,
+    interests,
+    runtimeStorage,
+    userId,
+    isInitialized,
+    state,
+    updateRelationshipCache
+  ])
 
   return (
     <Container>
@@ -48,6 +59,7 @@ const InterestsList = ({ title, interests, userId }) => {
                   state={state}
                   setState={setState}
                   userId={userId}
+                  form={form}
                 />
               }
             >
@@ -63,10 +75,9 @@ const InterestsList = ({ title, interests, userId }) => {
           <Col>No interests</Col>
         </Row>
       ) : null}
-      {state?.map((interest) => {
-        console.log('interest ID ---->', interest?.id)
-        return <InterestSimpleView key={interest?.id} interest={interest} />
-      })}
+      {state?.map((interest) => (
+        <InterestSimpleView key={interest?.id} interest={interest} />
+      ))}
     </Container>
   )
 }

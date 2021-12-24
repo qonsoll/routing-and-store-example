@@ -13,7 +13,6 @@ import useGetRefreshStatus from './useGetRefreshStatus'
 const useFindRecord = (query, config) => {
   // Extracting method for getting refresh status (if refresh is allowed or no)
   const getRefreshStatus = useGetRefreshStatus()
-  console.log('getRefreshStatus', getRefreshStatus())
 
   // Generating queryHash for the saving to the runtime storage
   const queryHash = useMemo(() => query && md5(query), [query])
@@ -34,10 +33,6 @@ const useFindRecord = (query, config) => {
   })
 
   // Fetch record data from DB
-  console.log(
-    'needFetch ???',
-    !isRefreshAllowed && (cacheLoading || Boolean(cachedDocuments))
-  )
   const [dbDocuments, loading, error] = useFetchRecord(query, {
     disableFetch:
       (!isRefreshAllowed && (cacheLoading || Boolean(cachedDocuments))) ||
