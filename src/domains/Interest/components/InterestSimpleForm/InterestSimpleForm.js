@@ -1,31 +1,36 @@
 import { Container, Row, Col, Input } from '@qonsoll/react-design'
-import { useForm, Controller } from 'react-hook-form'
+import { useCallback } from 'react'
+import { useModel } from 'services/qonsoll-data/Store'
+import { Form } from 'antd'
 
-const InterestSimpleForm = () => {
-  const { control, handleSubmit } = useForm({
-    defaultValues: {
-      name: ''
-    }
-  })
+const InterestSimpleForm = ({ state, setState, form }) => {
+  const [, getInterestId] = useModel('interest')
+  const interestId = getInterestId()
 
-  const onSubmit = (data) => console.log(data)
+  const onEnterPress = useCallback(
+    (e) => {
+      if (e.key === 'Enter') {
+        const newInterests = [...state]
+        newInterests.push({ id: interestId, name: e.target.value })
+        setState([...newInterests])
+        form.resetFields()
+      }
+    },
+    [form, interestId, setState, state]
+  )
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
+    <Form form={form}>
       <Container>
         <Row mb={3}>
           <Col>
-            <Controller
-              name="name"
-              control={control}
-              render={({ field }) => (
-                <Input {...field} placeholder="Enter interest" />
-              )}
-            />
+            <Form.Item name="name">
+              <Input onKeyDown={onEnterPress} placeholder="Enter interest" />
+            </Form.Item>
           </Col>
         </Row>
       </Container>
-    </form>
+    </Form>
   )
 }
 

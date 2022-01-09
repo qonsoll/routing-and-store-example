@@ -2,23 +2,23 @@ import { useEffect } from 'react'
 import { Container, Row, Col, Input, Title } from '@qonsoll/react-design'
 import { Form, DatePicker } from 'antd'
 import { useModel } from 'services/qonsoll-data/Store'
-import moment from 'moment'
+import { useQForm } from '../UserAdvancedForm/hooks'
 
-const UserSimpleForm = ({ id, title, data, form }) => {
+const UserSimpleForm = ({ id, title, user, form }) => {
   const [userModel] = useModel('user')
+  const { initializeForm, updateCache } = useQForm({
+    form,
+    modelName: 'user',
+    document: user,
+    id
+  })
 
   useEffect(() => {
-    data
-      ? form.setFieldsValue({
-          firstName: data?.firstName,
-          lastName: data?.lastName,
-          birthDate: moment(data?.birthDate)
-        })
-      : form.setFieldsValue(userModel?.defaultValues)
-  }, [form, data, userModel?.defaultValues])
+    initializeForm()
+  }, [form, initializeForm, updateCache, user, userModel?.defaultValues])
 
   return (
-    <Form form={form} onFinish={() => {}}>
+    <Form form={form} onValuesChange={updateCache} onFinish={() => {}}>
       <Container mb={4}>
         {title ? (
           <Row mb={3}>

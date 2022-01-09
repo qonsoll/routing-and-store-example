@@ -51,7 +51,6 @@ class RuntimeStorage {
       ? { ...currentValue, ...value }
       : value
     _.set(this.state, path, newValue)
-    this.deepUpdate(value)
     this.listener(path, this.copyState())
   }
 

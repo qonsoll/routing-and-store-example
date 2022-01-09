@@ -16,6 +16,12 @@ const useMutation = () => {
    */
   const validateData = async (modelName, data) => {
     const modelNameSingular = modelName && pluralize.singular(modelName)
+    await models[modelNameSingular].validationSchema
+      .validate(data)
+      .catch((err) => {
+        console.error(err.name)
+        console.error(err.errors)
+      })
     const isValid = await models[modelNameSingular].validationSchema.isValid(
       data
     )
@@ -67,13 +73,13 @@ const useMutation = () => {
     const isValid = await validateData(modelName, data)
 
     if (isValid) {
+      console.log('Data is valid')
       // Update data in runtime storage
       runtimeStorage.update(`structured.${normalizedModelName}.${id}`, data)
 
       // Update data in DB (depends on adapter)
       await defaultAdapter.updateRecord(normalizedModelName, id, data)
     } else {
-      throw new Error('Invalid data')
     }
   }
 

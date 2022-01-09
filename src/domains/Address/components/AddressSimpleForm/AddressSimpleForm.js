@@ -3,17 +3,30 @@ import { Container, Row, Col, Title } from '@qonsoll/react-design'
 import { Form } from 'antd'
 import { CitySelect } from 'domains/City/components'
 import { CountrySelect } from 'domains/Country/components'
+import { useQForm } from '../../../User/components/UserAdvancedForm/hooks'
 
-const AddressSimpleForm = ({ title, address, form }) => {
+const AddressSimpleForm = ({ title, address, form, id, userId }) => {
+  const { initializeForm, updateCache, updateRelationshipCache } = useQForm({
+    parentId: userId,
+    id,
+    modelName: 'address',
+    document: address,
+    form
+  })
+
   useEffect(() => {
-    address &&
-      form.setFieldsValue({
-        city: address?.city?.id,
-        country: address?.country?.id
-      })
-  }, [form, address])
+    initializeForm()
+  }, [form, address, updateCache, initializeForm])
+
   return (
-    <Form form={form} onFinish={() => {}}>
+    <Form
+      form={form}
+      onFinish={() => {}}
+      onValuesChange={() => {
+        updateCache()
+        updateRelationshipCache('user', userId)
+      }}
+    >
       <Container mb={4}>
         {title ? (
           <Row mb={3}>

@@ -1,12 +1,16 @@
-// import { useCallback } from 'react'
+import { useCallback } from 'react'
 import { Form } from 'antd'
-// import { Button } from '@qonsoll/react-design'
+import { Button } from '@qonsoll/react-design'
 import UserSimpleForm from '../UserSimpleForm'
 import { AddressSimpleForm } from 'domains/Address/components'
 import { InterestsList } from 'domains/Interest/components'
-import { useFindRecord } from 'services/qonsoll-data/Store'
+import { useFindRecord, useModel } from 'services/qonsoll-data/Store'
+import { useHistory } from 'react-router-dom'
+import { useQForm } from './hooks'
 
 const UserAdvancedForm = ({ id }) => {
+  const history = useHistory()
+
   const query = `query {
     users(id: "${id}") {
       firstName,
@@ -29,16 +33,32 @@ const UserAdvancedForm = ({ id }) => {
       }
     }
 }`
+
   const [user, loading] = useFindRecord(query)
+  const [, getAddressId] = useModel('address')
+  const [, getUserId] = useModel('user')
+
+  const currentAddressId = user?.address?.id || getAddressId()
+  const currentUserId = id || getUserId()
 
   const [userForm] = Form.useForm()
   const [addressForm] = Form.useForm()
+  const [interestForm] = Form.useForm()
 
-  // const submit = useCallback(() => {
-  //   const user = userForm.getFieldsValue()
-  //   const address = addressForm.getFieldsValue()
-  //   console.log('form data ->', user, address)
-  // }, [userForm, addressForm])
+  console.log('currentUserId', currentUserId)
+
+  const { submit } = useQForm({
+    parentId: currentUserId,
+    id: currentUserId,
+    actionType: id ? 'update' : 'create',
+    modelName: 'user',
+    relationshipModels: ['address', 'interest']
+  })
+
+  const submitSave = useCallback(() => {
+    submit()
+    history.push('/users')
+  }, [history, submit])
 
   return (
     <>
@@ -50,15 +70,22 @@ const UserAdvancedForm = ({ id }) => {
             title="General info"
             form={userForm}
             user={user}
-            id={id}
+            id={currentUserId}
           />
           <AddressSimpleForm
             title="Address"
             form={addressForm}
             address={user?.address}
+            userId={currentUserId}
+            id={currentAddressId}
           />
-          <InterestsList title="Interests" interests={user?.interests} />
-          {/* <Button onClick={submit}>Save</Button> */}
+          <InterestsList
+            userId={currentUserId}
+            title="Interests"
+            interests={user?.interests}
+            form={interestForm}
+          />
+          <Button onClick={submitSave}>Save</Button>
         </>
       )}
     </>

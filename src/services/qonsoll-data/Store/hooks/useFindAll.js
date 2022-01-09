@@ -32,8 +32,6 @@ const useFindAll = (query, config) => {
     disablePeek: config?.disablePeek
   })
 
-  console.log(cachedDocuments)
-
   // Fetch all data from DB
   const [dbDocuments, loading, error] = useFetchAll(query, {
     disableFetch:

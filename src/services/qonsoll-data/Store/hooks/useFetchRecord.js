@@ -44,7 +44,6 @@ const useFetchRecord = (query, config) => {
     const fetchRecordHandler = async () => {
       // Start loading
       setLoading(true)
-
       try {
         // Fetch record data from the DB using default adapter
         const dbData = await fetchRecord({
@@ -68,13 +67,14 @@ const useFetchRecord = (query, config) => {
         setLoading(false)
       } catch (err) {
         // Catch errors
-        console.err(err)
+        console.error(err)
         error.current = err
       }
     }
     let interval
     if (!config?.disableFetch) {
       if (config?.forceIntervalRefresh && config?.fetchInterval) {
+        console.log(config?.forceIntervalRefresh && config?.fetchInterval)
         // Refetch data after interval
         fetchRecordHandler()
         interval = setInterval(fetchRecordHandler, config?.fetchInterval * 1000)

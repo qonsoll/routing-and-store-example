@@ -9,13 +9,40 @@ import {
 } from '@qonsoll/react-design'
 import InterestSimpleView from '../InterestSimpleView'
 import InterestSimpleForm from '../InterestSimpleForm'
+import { useStore } from 'services/qonsoll-data/Store'
+import { useQForm } from '../../../User/components/UserAdvancedForm/hooks'
 
-const InterestsList = ({ title, interests }) => {
+const InterestsList = ({ title, interests, userId, form }) => {
+  const { runtimeStorage } = useStore()
+  const [isInitialized, setIsInitialized] = useState(true)
+  console.log('parrent id in interest list', userId)
+
   const [state, setState] = useState([])
 
+  const { updateCache, updateRelationshipCache } = useQForm({
+    parentId: userId,
+    modelName: 'interests',
+    document: state
+  })
+
   useEffect(() => {
-    interests && setState(interests)
-  }, [interests])
+    if (interests && isInitialized) {
+      setState(interests)
+      setIsInitialized(false)
+    }
+    if (state.length !== 0) {
+      updateCache()
+      updateRelationshipCache('user', userId)
+    }
+  }, [
+    updateCache,
+    interests,
+    runtimeStorage,
+    userId,
+    isInitialized,
+    state,
+    updateRelationshipCache
+  ])
 
   return (
     <Container>
@@ -27,7 +54,14 @@ const InterestsList = ({ title, interests }) => {
           <Col cw="auto">
             <Dropdown
               onVisibleChange={function noRefCheck() {}}
-              overlay={<InterestSimpleForm />}
+              overlay={
+                <InterestSimpleForm
+                  state={state}
+                  setState={setState}
+                  userId={userId}
+                  form={form}
+                />
+              }
             >
               <Button type="primary" size="small">
                 Add interest
@@ -36,7 +70,7 @@ const InterestsList = ({ title, interests }) => {
           </Col>
         </Row>
       ) : null}
-      {!interests?.length ? (
+      {!state?.length ? (
         <Row>
           <Col>No interests</Col>
         </Row>

@@ -11,8 +11,13 @@ import useGetRefreshStatus from './useGetRefreshStatus'
  * @returns [document, loading, error]
  */
 const useFindRecord = (query, config) => {
+  // Extracting method for getting refresh status (if refresh is allowed or no)
   const getRefreshStatus = useGetRefreshStatus()
+
+  // Generating queryHash for the saving to the runtime storage
   const queryHash = useMemo(() => query && md5(query), [query])
+
+  // Check that is refresh allowed
   const isRefreshAllowed = useMemo(
     () =>
       config?.fetchInterval
@@ -20,22 +25,32 @@ const useFindRecord = (query, config) => {
         : false,
     [queryHash, config?.fetchInterval, getRefreshStatus]
   )
-  const [cachedDocument, cacheLoading] = usePeekRecord(query, {
+
+  // Peek record data from cache if needed
+  const [cachedDocuments, cacheLoading] = usePeekRecord(query, {
     construct: config?.construct,
     disablePeek: config?.disablePeek
   })
-  const [dbDocument, loading, error] = useFetchRecord(query, {
+
+  // Fetch record data from DB
+  const [dbDocuments, loading, error] = useFetchRecord(query, {
     disableFetch:
-      (!isRefreshAllowed && (cacheLoading || Boolean(cachedDocument))) ||
+      (!isRefreshAllowed && (cacheLoading || Boolean(cachedDocuments))) ||
       config?.disableFetch,
     fetchInterval: config?.fetchInterval,
     forceIntervalRefresh: config?.forceIntervalRefresh,
     construct: config?.construct
   })
-  const document = useRef([])
-  document.current = dbDocument?.length ? dbDocument : cachedDocument
 
-  return [document.current, loading, error]
+  // Result documents
+  const documents = useRef([])
+
+  // Update result document by data from DB or cache
+  documents.current = dbDocuments?.length
+    ? dbDocuments?.[0]
+    : cachedDocuments?.[0]
+
+  return [documents.current, loading, error]
 }
 
 export default useFindRecord
